@@ -358,116 +358,111 @@ body{padding-bottom:80px}
 // DATA — Repas variés pour chaque jour de la semaine
 // ═══════════════════════════════════════════════════════════════
 
-// 3 variantes petit-déj
+// 3 variantes petit-déj — ALLÉGÉS car midi Marie Blachère = ~1500 kcal
 const BREAKFASTS = [
   {
     name:'Oeufs brouillés + fromage blanc',
-    foods:[{n:'Oeufs brouillés',q:'3'},{n:'Pain complet',q:'1 tranche'},{n:'Fromage blanc 0%',q:'150g'},{n:'Banane',q:'1'}],
-    prot:42, cal:480,
+    foods:[{n:'Oeufs brouillés',q:'3'},{n:'Fromage blanc 0%',q:'150g'}],
+    prot:33, cal:300,
     supps:'Créatine 5g + D3K2 3 gouttes (sur les oeufs)'
   },
   {
     name:'Oeufs au plat + avocat',
-    foods:[{n:'Oeufs au plat',q:'3'},{n:'Avocat',q:'1/2'},{n:'Pain complet',q:'1 tranche'},{n:'Kiwi',q:'1'}],
-    prot:27, cal:460,
+    foods:[{n:'Oeufs au plat',q:'3'},{n:'Avocat',q:'1/2'}],
+    prot:24, cal:350,
     supps:'Créatine 5g + D3K2 3 gouttes'
   },
   {
     name:'Overnight oats protéinés',
-    foods:[{n:'Flocons d\'avoine',q:'60g'},{n:'Fromage blanc 0%',q:'150g'},{n:'Whey nature',q:'25g'},{n:'Amandes',q:'20g'},{n:'Banane',q:'1'}],
-    prot:45, cal:550,
+    foods:[{n:'Flocons d\'avoine',q:'50g'},{n:'Fromage blanc 0%',q:'150g'},{n:'Whey nature',q:'25g'},{n:'Banane',q:'1'}],
+    prot:40, cal:420,
     supps:'Créatine 5g + D3K2 3 gouttes (dans un verre)'
   },
 ];
 
-// 7 déjeuners — Lun-Ven chez Marie Blachère, weekend maison
-// Valentin prend en général 1 sandwich + 4 mini wraps/viennois/pains
+// 7 déjeuners — Lun-Ven achetés chez Marie Blachère, weekend maison
+// Combo type : ~3 produits, ~1400-1500 kcal, ~60-70g protéines
 const LUNCHES = [
   {
-    name:'Marie Blachère — Poulet crudités',
-    foods:[{n:'Sandwich poulet crudités',q:'1 (335g)'},{n:'P\'tit viennois thon',q:'1'},{n:'Eau',q:'50cl'}],
-    prot:55, cal:1050,
-    note:'Le poulet crudités = 43g prot. Privilégie ce sandwich.'
+    name:'MB — Maïstik + Wrap crispy + Sandwich crudités',
+    foods:[{n:'Club Maïstik (poulet, mayo, pain maïs)',q:'1 (~250g)'},{n:'Wrap poulet crispy',q:'1 (~200g)'},{n:'Sandwich crudités (poulet)',q:'1 (~250g)'}],
+    prot:69, cal:1480
   },
   {
-    name:'Marie Blachère — Thon + p\'tits',
-    foods:[{n:'Sandwich thon crudités',q:'1'},{n:'P\'tit jambon beurre',q:'2'},{n:'Eau',q:'50cl'}],
-    prot:40, cal:900,
-    note:'Thon = bonne source protéines. Évite les viennois sucrés.'
+    name:'MB — 2x Maïstik + Wrap crispy',
+    foods:[{n:'Club Maïstik',q:'2 (~500g)'},{n:'Wrap poulet crispy',q:'1 (~200g)'}],
+    prot:66, cal:1530
   },
   {
-    name:'Marie Blachère — Jambon emmental + wraps',
-    foods:[{n:'Sandwich jambon emmental',q:'1'},{n:'Wrap poulet',q:'1'},{n:'P\'tit jambon beurre',q:'1'},{n:'Eau',q:'50cl'}],
-    prot:35, cal:850,
-    note:'Attention : jambon emmental = seulement 6g prot pour 464 kcal. Complète avec un wrap poulet.'
+    name:'MB — Maïstik + Wrap thon + Sandwich crudités',
+    foods:[{n:'Club Maïstik',q:'1'},{n:'Wrap thon',q:'1 (~200g)'},{n:'Sandwich crudités (thon)',q:'1 (~250g)'}],
+    prot:65, cal:1430
   },
   {
-    name:'Marie Blachère — Poulet + mini wraps',
-    foods:[{n:'Sandwich poulet crudités',q:'1 (335g)'},{n:'P\'tit wrap poulet',q:'1'},{n:'Eau',q:'50cl'}],
-    prot:52, cal:1050,
-    note:'Le poulet crudités = 43g prot. Rajoute un wrap pour compléter.'
+    name:'MB — Wrap crispy + Wrap thon + Maïstik',
+    foods:[{n:'Wrap poulet crispy',q:'1'},{n:'Wrap thon',q:'1'},{n:'Club Maïstik',q:'1'}],
+    prot:64, cal:1400
   },
   {
-    name:'Marie Blachère — Mix protéiné',
-    foods:[{n:'Wrap poulet',q:'2'},{n:'P\'tit viennois thon',q:'2'},{n:'Eau',q:'50cl'}],
-    prot:42, cal:800,
-    note:'Plusieurs petits = plus de variété.'
+    name:'MB — 2x Maïstik + Sandwich crudités',
+    foods:[{n:'Club Maïstik',q:'2'},{n:'Sandwich crudités (poulet)',q:'1'}],
+    prot:69, cal:1600
   },
   {
-    name:'Weekend — Bowl maison protéiné',
-    foods:[{n:'Crevettes cuites',q:'150g'},{n:'Quinoa cuit',q:'100g'},{n:'Avocat',q:'1/2'},{n:'Tomate cerise',q:'100g'},{n:'Concombre',q:'1/2'},{n:'Feta',q:'30g'},{n:'Huile olive + citron',q:'1 cs'}],
-    prot:42, cal:520
-  },
-  {
-    name:'Weekend — Omelette garnie',
+    name:'Weekend — Omelette garnie maison',
     foods:[{n:'Oeufs',q:'4'},{n:'Jambon blanc',q:'2 tranches'},{n:'Emmental râpé',q:'30g'},{n:'Salade verte',q:'garniture'},{n:'Pain complet',q:'1 tranche'}],
     prot:45, cal:550
   },
+  {
+    name:'Weekend — Poulet riz express',
+    foods:[{n:'Filet de poulet',q:'200g'},{n:'Riz basmati',q:'80g (sec)'},{n:'Courgette sautée',q:'150g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Sauce soja',q:'1 cs'}],
+    prot:52, cal:580
+  },
 ];
 
-// 7 dîners différents (un par jour)
+// 7 dîners — LÉGERS car midi = ~1500 kcal. Focus protéine + légumes, peu de féculents.
 const DINNERS = [
   {
-    name:'Poulet grillé, lentilles, brocoli',
-    foods:[{n:'Filet de poulet',q:'200g'},{n:'Lentilles vertes (sec)',q:'80g'},{n:'Brocoli',q:'150g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Ail, curcuma',q:''}],
-    prot:58, cal:620,
-    recipe:'Lentilles 20 min à l\'eau. Poulet en lanières saisi 5 min. Brocoli sauté 5 min avec ail. Assembler.'
+    name:'Poulet grillé + brocoli sauté',
+    foods:[{n:'Filet de poulet',q:'200g'},{n:'Brocoli',q:'200g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Ail, curcuma',q:''}],
+    prot:49, cal:350,
+    recipe:'Poulet en lanières saisi 5 min feu vif. Brocoli sauté 5 min avec ail + curcuma. C\'est tout.'
   },
   {
-    name:'Cabillaud au four, quinoa, épinards',
-    foods:[{n:'Filet de cabillaud',q:'200g'},{n:'Quinoa (sec)',q:'80g'},{n:'Épinards frais',q:'200g'},{n:'Citron',q:'1/2'},{n:'Ail',q:'1 gousse'}],
-    prot:48, cal:500,
-    recipe:'Quinoa 12 min. Cabillaud au four 15 min à 200°C. Épinards sautés 2 min avec ail. Citron sur le poisson.'
+    name:'Cabillaud au citron + épinards',
+    foods:[{n:'Filet de cabillaud',q:'200g'},{n:'Épinards frais',q:'250g'},{n:'Citron',q:'1/2'},{n:'Ail',q:'1 gousse'},{n:'Huile d\'olive',q:'1 cs'}],
+    prot:42, cal:280,
+    recipe:'Cabillaud poêlé 4 min/face. Épinards tombés 2 min à l\'ail. Citron sur le poisson.'
   },
   {
-    name:'Steak haché, patate douce, haricots verts',
-    foods:[{n:'Steak haché 5%',q:'200g'},{n:'Patate douce',q:'200g'},{n:'Haricots verts',q:'150g'},{n:'Oignon',q:'1'},{n:'Herbes de Provence',q:''}],
-    prot:50, cal:600,
-    recipe:'Patate douce en cubes 15 min vapeur. Haricots 10 min. Steak saisi avec oignon émincé.'
+    name:'Steak haché + haricots verts',
+    foods:[{n:'Steak haché 5%',q:'200g'},{n:'Haricots verts',q:'200g'},{n:'Oignon',q:'1'},{n:'Herbes de Provence',q:''}],
+    prot:48, cal:360,
+    recipe:'Steak saisi avec oignon émincé 5 min. Haricots verts vapeur ou poêlés 8 min.'
   },
   {
-    name:'Saumon, riz complet, courgettes',
-    foods:[{n:'Pavé de saumon',q:'180g'},{n:'Riz complet (sec)',q:'80g'},{n:'Courgettes',q:'200g'},{n:'Sauce soja',q:'1 cs'},{n:'Gingembre frais',q:'1 cm'}],
-    prot:44, cal:620,
-    recipe:'Riz complet 25 min. Saumon poêlé 4 min/face. Courgettes en rondelles sautées au wok avec soja et gingembre.'
+    name:'Saumon + courgettes au soja',
+    foods:[{n:'Pavé de saumon',q:'150g'},{n:'Courgettes',q:'250g'},{n:'Sauce soja',q:'1 cs'},{n:'Gingembre frais',q:'1 cm'}],
+    prot:35, cal:370,
+    recipe:'Saumon poêlé 4 min/face. Courgettes en rondelles sautées au wok 5 min avec soja + gingembre.'
   },
   {
-    name:'Dinde, boulgour, poivrons',
-    foods:[{n:'Escalope de dinde',q:'200g'},{n:'Boulgour (sec)',q:'80g'},{n:'Poivrons (rouge+jaune)',q:'200g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Paprika, cumin',q:''}],
-    prot:54, cal:580,
-    recipe:'Boulgour 10 min. Dinde en morceaux saisie 5 min feu vif. Poivrons en lanières sautés 5 min. Épices.'
+    name:'Dinde + poivrons sautés',
+    foods:[{n:'Escalope de dinde',q:'200g'},{n:'Poivrons (rouge+jaune)',q:'250g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Paprika, cumin',q:''}],
+    prot:50, cal:330,
+    recipe:'Dinde en morceaux saisie 5 min feu vif. Poivrons en lanières sautés 5 min. Paprika + cumin.'
   },
   {
-    name:'Filet mignon, haricots rouges, salade',
-    foods:[{n:'Filet mignon de porc',q:'200g'},{n:'Haricots rouges (conserve)',q:'200g'},{n:'Salade mélangée',q:'100g'},{n:'Tomate',q:'1'},{n:'Huile olive + vinaigre',q:'1 cs'}],
-    prot:52, cal:560,
-    recipe:'Filet mignon tranché, saisi 5 min. Haricots rouges réchauffés 3 min. Salade + tomate en vinaigrette.'
+    name:'Filet mignon + salade composée',
+    foods:[{n:'Filet mignon de porc',q:'200g'},{n:'Salade mélangée',q:'100g'},{n:'Tomate',q:'1'},{n:'Concombre',q:'1/2'},{n:'Huile olive + vinaigre',q:'vinaigrette'}],
+    prot:44, cal:320,
+    recipe:'Filet mignon tranché, saisi 5 min. Salade + tomate + concombre en vinaigrette.'
   },
   {
-    name:'Truite, pois chiches, asperges',
-    foods:[{n:'Filet de truite',q:'200g'},{n:'Pois chiches (conserve)',q:'200g'},{n:'Asperges vertes',q:'1 botte'},{n:'Citron',q:'1/2'},{n:'Persil frais',q:''}],
-    prot:50, cal:540,
-    recipe:'Truite + asperges au four 15 min à 200°C. Pois chiches en poêle avec paprika 3 min. Citron + persil.'
+    name:'Truite au four + asperges',
+    foods:[{n:'Filet de truite',q:'200g'},{n:'Asperges vertes',q:'1 botte (~200g)'},{n:'Citron',q:'1/2'},{n:'Persil frais',q:''}],
+    prot:43, cal:300,
+    recipe:'Truite + asperges sur plaque au four 15 min à 200°C. Citron + persil frais.'
   },
 ];
 
@@ -575,12 +570,10 @@ const SHOPPING = [
     {name:'Sauce soja',qty:'1 bouteille',price:'2€',usage:'Dîner jeudi'},
   ]},
   {section:'Marie Blachère (midi Lun-Ven)',items:[
-    {name:'Sandwich poulet crudités',qty:'x2 /sem',price:'~10€',usage:'Lundi + jeudi — le plus protéiné'},
-    {name:'Sandwich thon crudités',qty:'x1 /sem',price:'~5€',usage:'Mardi'},
-    {name:'Wrap poulet',qty:'x3 /sem',price:'~6€',usage:'Mercredi + vendredi'},
-    {name:'P\'tit viennois thon',qty:'x2 /sem',price:'~3€',usage:'Complément lundi'},
-    {name:'P\'tit jambon beurre',qty:'x2 /sem',price:'~3€',usage:'Complément mardi'},
-    {name:'P\'tit wrap poulet',qty:'x2 /sem',price:'~4€',usage:'Complément jeudi + vendredi'},
+    {name:'Club Maïstik (poulet)',qty:'5-8 /sem',price:'~20-30€',usage:'Base de chaque midi — le plus protéiné'},
+    {name:'Wrap poulet crispy',qty:'3-5 /sem',price:'~10-15€',usage:'Complément chaque midi'},
+    {name:'Wrap thon',qty:'1-2 /sem',price:'~4€',usage:'Variante du wrap poulet'},
+    {name:'Sandwich crudités (poulet/thon)',qty:'2-3 /sem',price:'~8-10€',usage:'3ème produit du combo'},
   ]},
 ];
 
