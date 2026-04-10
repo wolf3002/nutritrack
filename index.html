@@ -341,8 +341,8 @@ textarea.journal-input{min-height:100px;resize:vertical;font-family:inherit}
 <!-- ═══════════ PAGE COURSES ═══════════ -->
 <div id="page-shop" class="page">
   <div class="header">
-    <h1>Courses de la semaine</h1>
-    <div class="subtitle">Grand Frais — Semaine <span id="shopWeek"></span>/4</div>
+    <h1>Courses — Semaine <span id="shopWeek"></span>/4</h1>
+    <div class="subtitle">Par magasin, dans l'ordre de tes arrêts</div>
   </div>
   <div id="shopList"></div>
   <div class="shop-total" id="shopTotal"></div>
@@ -539,94 +539,179 @@ function getCurrentWeekIndex(){
 }
 
 // Shopping lists par semaine — cohérentes avec les dîners
-const ALL_SHOPPING = [
-  // SEMAINE 1
+// ═══════════════════════════════════════════════════════════════
+// LISTES DE COURSES PAR MAGASIN — avec indicateurs qualité
+// Organisé par arrêt : tu fais tes courses dans l'ordre
+// ═══════════════════════════════════════════════════════════════
+
+// Viande par semaine (pour Boucherie Hecquet)
+const MEAT_BY_WEEK = [
+  // S1
   [
-    {section:'Boucherie',items:[
-      {name:'Filets de poulet',qty:'400g',price:'5€',usage:'Dîner lun + weekend'},
-      {name:'Escalopes de dinde',qty:'200g',price:'3€',usage:'Dîner ven'},
-      {name:'Steak haché 5%',qty:'200g',price:'3€',usage:'Dîner mer'},
-      {name:'Filet mignon de porc',qty:'200g',price:'4€',usage:'Dîner sam'},
-      {name:'Jambon blanc',qty:'4 tranches',price:'2€',usage:'Weekend'},
-    ]},
-    {section:'Poissonnerie',items:[
-      {name:'Cabillaud (filets)',qty:'200g',price:'5€',usage:'Dîner mar'},
-      {name:'Pavé de saumon',qty:'180g',price:'5€',usage:'Dîner jeu'},
-      {name:'Truite (filets)',qty:'200g',price:'4€',usage:'Dîner dim'},
-    ]},
+    {name:'Filets de poulet CRU',qty:'400g',price:'~6€',usage:'Dîner lun + weekend'},
+    {name:'Escalopes de dinde CRU',qty:'200g',price:'~4€',usage:'Dîner ven'},
+    {name:'Steak haché frais 5%',qty:'200g',price:'~4€',usage:'Dîner mer'},
+    {name:'Filet mignon de porc',qty:'200g',price:'~5€',usage:'Dîner sam'},
   ],
-  // SEMAINE 2
+  // S2
   [
-    {section:'Boucherie',items:[
-      {name:'Escalope de veau',qty:'200g',price:'5€',usage:'Dîner lun'},
-      {name:'Rumsteck',qty:'200g',price:'5€',usage:'Dîner mer'},
-      {name:'Filets de poulet',qty:'400g',price:'5€',usage:'Dîner ven + weekend'},
-      {name:'Lapin (râble)',qty:'200g',price:'5€',usage:'Dîner sam'},
-    ]},
-    {section:'Poissonnerie',items:[
-      {name:'Lieu noir (filets)',qty:'200g',price:'4€',usage:'Dîner mar'},
-      {name:'Maquereau (filets)',qty:'180g',price:'4€',usage:'Dîner jeu'},
-      {name:'Daurade (filets)',qty:'200g',price:'5€',usage:'Dîner dim'},
-    ]},
+    {name:'Escalope de veau',qty:'200g',price:'~6€',usage:'Dîner lun'},
+    {name:'Rumsteck',qty:'200g',price:'~6€',usage:'Dîner mer'},
+    {name:'Filets de poulet CRU',qty:'400g',price:'~6€',usage:'Dîner ven + weekend'},
+    {name:'Lapin (râble ou cuisse)',qty:'200g',price:'~6€',usage:'Dîner sam'},
   ],
-  // SEMAINE 3
+  // S3
   [
-    {section:'Boucherie',items:[
-      {name:'Escalopes de dinde',qty:'400g',price:'6€',usage:'Dîner lun'},
-      {name:'Bavette d\'aloyau',qty:'200g',price:'5€',usage:'Dîner mer'},
-      {name:'Filets de poulet',qty:'200g',price:'3€',usage:'Dîner ven'},
-      {name:'Onglet de boeuf',qty:'200g',price:'5€',usage:'Dîner sam'},
-    ]},
-    {section:'Poissonnerie',items:[
-      {name:'Colin (filets)',qty:'200g',price:'4€',usage:'Dîner mar'},
-      {name:'Truite (filets)',qty:'200g',price:'4€',usage:'Dîner jeu'},
-      {name:'Crevettes décortiquées',qty:'200g',price:'5€',usage:'Dîner dim'},
-    ]},
+    {name:'Escalopes de dinde CRU',qty:'400g',price:'~7€',usage:'Dîner lun'},
+    {name:'Bavette d\'aloyau',qty:'200g',price:'~6€',usage:'Dîner mer'},
+    {name:'Filets de poulet CRU',qty:'200g',price:'~3€',usage:'Dîner ven'},
+    {name:'Onglet de boeuf',qty:'200g',price:'~6€',usage:'Dîner sam'},
   ],
-  // SEMAINE 4
+  // S4
   [
-    {section:'Boucherie',items:[
-      {name:'Filets de poulet',qty:'200g',price:'3€',usage:'Dîner lun'},
-      {name:'Filet mignon de porc',qty:'200g',price:'4€',usage:'Dîner mer'},
-      {name:'Escalopes de dinde',qty:'200g',price:'3€',usage:'Dîner ven'},
-      {name:'Rumsteck',qty:'200g',price:'5€',usage:'Dîner sam'},
-    ]},
-    {section:'Poissonnerie',items:[
-      {name:'Pavé de thon frais',qty:'180g',price:'6€',usage:'Dîner mar'},
-      {name:'Pavé de saumon',qty:'180g',price:'5€',usage:'Dîner jeu'},
-      {name:'Lotte (filets)',qty:'200g',price:'7€',usage:'Dîner dim'},
-    ]},
+    {name:'Filets de poulet CRU',qty:'200g',price:'~3€',usage:'Dîner lun'},
+    {name:'Filet mignon de porc',qty:'200g',price:'~5€',usage:'Dîner mer'},
+    {name:'Escalopes de dinde CRU',qty:'200g',price:'~4€',usage:'Dîner ven'},
+    {name:'Rumsteck',qty:'200g',price:'~6€',usage:'Dîner sam'},
   ],
 ];
 
-// Courses communes à toutes les semaines
-const COMMON_SHOPPING = [
-  {section:'Crèmerie (chaque semaine)',items:[
-    {name:'Oeufs',qty:'18',price:'5€',usage:'Petit-déj quotidien'},
-    {name:'Fromage blanc 0%',qty:'1.5 kg',price:'4€',usage:'Petit-déj + snack soir'},
-    {name:'Emmental râpé',qty:'100g',price:'2€',usage:'Omelette'},
-  ]},
-  {section:'Fruits & Légumes (selon la semaine)',items:[
-    {name:'Avocats',qty:'2-3',price:'3€',usage:'Petit-déj'},
-    {name:'Bananes',qty:'1 kg',price:'2€',usage:'Petit-déj + overnight oats'},
-    {name:'Citrons',qty:'3',price:'1€',usage:'Poisson'},
-    {name:'Ail + oignons',qty:'1 tête + 2',price:'1€',usage:'Cuisine'},
-  ]},
-  {section:'Épicerie (stock mensuel)',items:[
-    {name:'Flocons d\'avoine',qty:'500g',price:'2€',usage:'Overnight oats'},
-    {name:'Pain complet',qty:'1 paquet',price:'3€',usage:'Petit-déj'},
-    {name:'Graines de courge',qty:'150g',price:'3€',usage:'Snack soir'},
-    {name:'Huile d\'olive',qty:'(stock)',price:'—',usage:'Cuisson'},
-    {name:'Sauce soja',qty:'(stock)',price:'—',usage:'Wok'},
-    {name:'Moutarde',qty:'(stock)',price:'—',usage:'Viande'},
-  ]},
-  {section:'Marie Blachère (Lun-Ven)',items:[
-    {name:'Club Maïstik',qty:'5-8 /sem',price:'~25€',usage:'Base du midi'},
-    {name:'Wrap poulet crispy',qty:'3-5 /sem',price:'~12€',usage:'Combo midi'},
-    {name:'Wrap thon',qty:'1-2 /sem',price:'~4€',usage:'Variante'},
-    {name:'Sandwich crudités',qty:'2-3 /sem',price:'~9€',usage:'Combo midi'},
-  ]},
+// Poisson par semaine (pour Grand Frais)
+const FISH_BY_WEEK = [
+  [{name:'Cabillaud (filet)',qty:'200g',price:'~5€',usage:'Dîner mar — demande SAUVAGE'},{name:'Saumon (pavé)',qty:'180g',price:'~5€',usage:'Dîner jeu — demande l\'origine'},{name:'Truite (filet)',qty:'200g',price:'~4€',usage:'Dîner dim'}],
+  [{name:'Lieu noir (filet)',qty:'200g',price:'~4€',usage:'Dîner mar — SAUVAGE, très clean'},{name:'Maquereau (filet)',qty:'180g',price:'~4€',usage:'Dîner jeu — riche oméga-3'},{name:'Daurade (filet)',qty:'200g',price:'~5€',usage:'Dîner dim'}],
+  [{name:'Colin (filet)',qty:'200g',price:'~4€',usage:'Dîner mar — budget-friendly'},{name:'Truite (filet)',qty:'200g',price:'~4€',usage:'Dîner jeu'},{name:'Crevettes',qty:'200g',price:'~5€',usage:'Dîner dim — vérifie label ASC'}],
+  [{name:'Thon frais (pavé)',qty:'180g',price:'~7€',usage:'Dîner mar — max 2x/sem (mercure)'},{name:'Saumon (pavé)',qty:'180g',price:'~5€',usage:'Dîner jeu'},{name:'Lotte (filet)',qty:'200g',price:'~7€',usage:'Dîner dim — ultra maigre'}],
 ];
+
+// Légumes par semaine (adaptés aux dîners)
+const VEG_BY_WEEK = [
+  // S1
+  [
+    {name:'Brocoli',qty:'300g',price:'~2€',usage:'Dîner lun'},
+    {name:'Épinards frais',qty:'200g',price:'~2€',usage:'Dîner mar'},
+    {name:'Haricots verts',qty:'200g',price:'~2€',usage:'Dîner mer'},
+    {name:'Courgettes',qty:'250g',price:'~2€',usage:'Dîner jeu'},
+    {name:'Poivrons',qty:'2 pièces',price:'~2€',usage:'Dîner ven'},
+    {name:'Asperges',qty:'1 botte',price:'~4€',usage:'Dîner dim'},
+  ],
+  // S2
+  [
+    {name:'Champignons de Paris',qty:'250g',price:'~2€',usage:'Dîner lun'},
+    {name:'Chou-fleur',qty:'1 pièce',price:'~2€',usage:'Dîner mar'},
+    {name:'Épinards frais',qty:'200g',price:'~2€',usage:'Dîner mer'},
+    {name:'Tomates cerise',qty:'250g',price:'~2€',usage:'Dîner jeu'},
+    {name:'Courgettes',qty:'250g',price:'~2€',usage:'Dîner ven'},
+    {name:'Haricots verts',qty:'200g',price:'~2€',usage:'Dîner sam'},
+    {name:'Fenouil',qty:'1 pièce',price:'~2€',usage:'Dîner dim'},
+  ],
+  // S3
+  [
+    {name:'Brocoli',qty:'200g',price:'~2€',usage:'Dîner lun'},
+    {name:'Courgettes + aubergine + poivron',qty:'400g total',price:'~4€',usage:'Dîner mar (ratatouille)'},
+    {name:'Salade verte',qty:'1 pièce',price:'~1€',usage:'Dîner mer'},
+    {name:'Tomates concassées',qty:'1 boîte',price:'~1€',usage:'Dîner jeu'},
+    {name:'Aubergines',qty:'250g',price:'~2€',usage:'Dîner ven'},
+    {name:'Champignons',qty:'200g',price:'~2€',usage:'Dîner sam'},
+    {name:'Courgettes + poivron + carotte',qty:'300g total',price:'~3€',usage:'Dîner dim (wok)'},
+  ],
+  // S4
+  [
+    {name:'Brocoli',qty:'200g',price:'~2€',usage:'Dîner lun'},
+    {name:'Haricots verts',qty:'200g',price:'~2€',usage:'Dîner mar'},
+    {name:'Carottes',qty:'300g',price:'~1€',usage:'Dîner mer'},
+    {name:'Patate douce + épinards',qty:'200g + 100g',price:'~2€',usage:'Dîner jeu'},
+    {name:'Courgettes',qty:'250g',price:'~2€',usage:'Dîner ven'},
+    {name:'Champignons + épinards',qty:'150g + 150g',price:'~3€',usage:'Dîner sam'},
+    {name:'Poireaux',qty:'200g',price:'~2€',usage:'Dîner dim'},
+  ],
+];
+
+const ALL_SHOPPING = MEAT_BY_WEEK; // placeholder, real render uses per-store logic
+
+const COMMON_SHOPPING = []; // placeholder, real render uses STORE_SHOPPING
+
+// ═══════════════════════════════════════════════════════════════
+// COURSES PAR MAGASIN — L'ordre de tes arrêts
+// ═══════════════════════════════════════════════════════════════
+function getStoresShopping(){
+  const w = CURRENT_WEEK;
+  return [
+    // ARRÊT 1 — BOUCHERIE HECQUET (Cinqueux)
+    {section:'BOUCHERIE HECQUET — Cinqueux',
+     note:'100% France | Boeuf Parthenaise | Volaille labellisée | Veau & Agneau Limousin',
+     items: MEAT_BY_WEEK[w].map(m=>({...m, check:'Vérifie : viande CRU brute, 1 seul ingrédient, pas pré-mariné'}))
+    },
+    // ARRÊT 2 — LIDL (Pont-Sainte-Maxence, rue Pasteur)
+    {section:'LIDL — rue Pasteur, Pont-Ste-Maxence',
+     note:'Oeufs bio + fromage blanc + flocons bio + basiques',
+     items:[
+      {name:'Oeufs BIO plein air',qty:'2x6 ou 1x12',price:'~4€',usage:'Petit-déj quotidien',check:'CODE 0 sur l\'oeuf = bio | Code 1 = plein air OK | Code 2 ou 3 = REFUSE'},
+      {name:'Fromage blanc 0% nature (Envia)',qty:'1.5 kg',price:'~3€',usage:'Petit-déj + snack soir',check:'Ingrédients = lait écrémé + ferments. C\'est TOUT. Pas d\'additifs'},
+      {name:'Flocons d\'avoine BIO',qty:'500g',price:'~2€',usage:'Overnight oats',check:'Prends la version BIO pour éviter résidus glyphosate'},
+      {name:'Emmental râpé',qty:'100g',price:'~1€',usage:'Omelette weekend',check:'Ingrédients = lait, sel, ferments. Pas de E-xxx'},
+      {name:'Bananes',qty:'1 kg',price:'~1€',usage:'Petit-déj + overnight oats',check:'Origine peu importante (bananes = peu de pesticides)'},
+     ]
+    },
+    // ARRÊT 3 — GRAND FRAIS (St-Maximin)
+    {section:'GRAND FRAIS — St-Maximin (poisson + fromage + légumes FR)',
+     note:'Poisson de criée | Fromage artisanal | Légumes FRANÇAIS de saison uniquement',
+     items:[
+      ...FISH_BY_WEEK[w].map(f=>({...f, check:'Demande au poissonnier : SAUVAGE ou élevage ? Privilégie sauvage + criée française'})),
+      ...VEG_BY_WEEK[w].map(v=>({...v, check:'Vérifie l\'étiquette ORIGINE FRANCE. Si Espagne/Maroc → prends pas, achète chez Lidl ou au marché'})),
+      {name:'Avocats',qty:'2-3',price:'~3€',usage:'Petit-déj',check:'Souvent Pérou/Espagne — OK, peu de pesticides sur avocat (peau épaisse)'},
+      {name:'Citrons',qty:'3',price:'~1€',usage:'Poisson',check:'Prends non traités si possible (tu utilises le zeste ?)'},
+      {name:'Ail + oignons',qty:'1 tête + 2',price:'~1€',usage:'Cuisine',check:'France de préférence. L\'ail de Chine est irradié'},
+      {name:'Herbes fraîches (persil, basilic)',qty:'1-2',price:'~2€',usage:'Saveur',check:'France quasi toujours — OK'},
+     ]
+    },
+    // ARRÊT 3 BIS — GRAND FRAIS ÉPICERIE (si besoin)
+    {section:'GRAND FRAIS — Épicerie (huile + épices)',
+     note:'Pour l\'huile d\'olive de qualité et les épices du monde',
+     items:[
+      {name:'Huile d\'olive AOP française',qty:'500ml VERRE',price:'~10-15€',usage:'Cuisson, assaisonnement',check:'OBLIGATOIRE : bouteille VERRE + AOP (Nyons, Provence). Pas de plastique. Pas de marque générique'},
+      {name:'Sauce soja',qty:'1 bouteille',price:'~3€',usage:'Wok',check:'Ingrédients = soja, blé, eau, sel. Pas de caramel (E150), pas de sucre ajouté. Marque Kikkoman = clean'},
+      {name:'Moutarde',qty:'1 pot',price:'~2€',usage:'Viande',check:'Ingrédients = graines moutarde, vinaigre, eau, sel. Pas d\'additifs'},
+     ]
+    },
+    // ARRÊT 4 — LECLERC (Val d'Halatte) — si besoin compléments épicerie
+    {section:'LECLERC — Val d\'Halatte (stock mensuel)',
+     note:'Légumineuses, céréales, conserves — vérifier compositions',
+     items:[
+      {name:'Lentilles vertes (sèches)',qty:'500g',price:'~2€',usage:'Dîners',check:'Ingrédient unique : lentilles. BIO si possible'},
+      {name:'Quinoa',qty:'500g',price:'~3€',usage:'Dîners',check:'Ingrédient unique : quinoa. BIO = mieux'},
+      {name:'Riz complet',qty:'500g',price:'~2€',usage:'Dîners',check:'Ingrédient unique : riz complet'},
+      {name:'Boulgour',qty:'500g',price:'~2€',usage:'Dîners',check:'Ingrédient unique : blé dur concassé'},
+      {name:'Pois chiches (conserve)',qty:'2 boîtes',price:'~2€',usage:'Dîners',check:'Ingrédients = pois chiches, eau, sel. PAS de sucre ni E-xxx'},
+      {name:'Haricots rouges (conserve)',qty:'2 boîtes',price:'~2€',usage:'Dîners',check:'Idem : pois, eau, sel UNIQUEMENT'},
+      {name:'Thon conserve Phare d\'Eckmühl',qty:'3 boîtes',price:'~8€',usage:'Sandwichs si tu fais maison',check:'SEULE marque recommandée. Petit Navire/Saupiquet = trop de mercure'},
+      {name:'Maquereau conserve (alternative)',qty:'3 boîtes',price:'~5€',usage:'Alternative au thon',check:'Petit poisson = moins de mercure. Vérifie : maquereau, huile olive, sel'},
+      {name:'Graines de courge',qty:'200g',price:'~3€',usage:'Snack soir',check:'Nature, non salées, non grillées'},
+      {name:'Pain complet',qty:'1 paquet',price:'~3€',usage:'Petit-déj',check:'Ingrédients : farine complète, eau, levure, sel. PAS de sucre ni huile de palme'},
+      {name:'Chocolat noir 70%+',qty:'1 tablette',price:'~2€',usage:'Plaisir (2 carrés)',check:'Ingrédients : pâte de cacao, sucre, beurre de cacao. PAS de lécithine de soja si possible'},
+     ]
+    },
+    // MARCHÉ — Vendredi
+    {section:'MARCHÉ DU VENDREDI — Place Delattre de Tassigny',
+     note:'Producteurs locaux | Circuit le plus court | Légumes/oeufs/volaille de saison',
+     items:[
+      {name:'Légumes de saison (selon dispo)',qty:'selon besoins',price:'variable',usage:'Complément semaine',check:'Demande au producteur : traitements ? Ça vient d\'où ? Les petits producteurs utilisent souvent moins de pesticides'},
+      {name:'Oeufs fermiers (si disponible)',qty:'12',price:'~4-5€',usage:'Alternative/complément Lidl bio',check:'Demande : les poules mangent quoi ? Plein air ? Meilleur que le supermarché'},
+      {name:'Miel local',qty:'1 pot',price:'~8-10€',usage:'Overnight oats + collation',check:'Miel local = non chauffé, non filtré industriellement. Bien supérieur au miel de supermarché'},
+     ]
+    },
+    // MARIE BLACHÈRE — Midi quotidien
+    {section:'MARIE BLACHÈRE — Midi (Lun-Ven)',
+     note:'Sandwichs + wraps quotidiens — pas de contrôle sur la composition',
+     items:[
+      {name:'Club Maïstik (poulet)',qty:'5-8 /sem',price:'~25€',usage:'Base du midi',check:'Pas d\'info sur l\'origine du poulet ni les additifs. C\'est le point faible de ton plan. Accepte-le pour la praticité'},
+      {name:'Wrap poulet crispy',qty:'3-5 /sem',price:'~12€',usage:'Combo midi',check:'Le poulet "crispy" = probablement pané avec additifs. Moins clean que du poulet nature'},
+      {name:'Wrap thon',qty:'1-2 /sem',price:'~4€',usage:'Variante',check:'Thon = risque mercure. Limite à 1-2/sem'},
+      {name:'Sandwich crudités',qty:'2-3 /sem',price:'~9€',usage:'Combo midi',check:'Vérifie si la mayo contient de l\'huile de colza ou tournesol (OK) vs huile de palme'},
+     ]
+    },
+  ];
+}
 
 const SWAPS = [
   {cat:'Protéines viande',from:'Poulet',to:'Dinde, Lapin, Veau, Pintade'},
@@ -839,20 +924,28 @@ function updateProgress(){
 // ═══════════════════════════════════════════════════════════════
 function renderShop(){
   let html='',totalPrice=0;
-  const SHOPPING=[...ALL_SHOPPING[CURRENT_WEEK],...COMMON_SHOPPING];
-  SHOPPING.forEach(section=>{
-    html+=`<div class="shop-section"><div class="shop-title">${section.section}</div>`;
+  const stores=getStoresShopping();
+  stores.forEach(section=>{
+    html+=`<div class="shop-section">
+      <div class="shop-title">${section.section}</div>`;
+    if(section.note){
+      html+=`<div style="font-size:10px;color:var(--green);padding:2px 0 6px;font-weight:600">${section.note}</div>`;
+    }
     section.items.forEach((item,i)=>{
-      const key=section.section+'-'+i;
+      const key=section.section.slice(0,15)+'-'+i;
       const bought=state.shopBought[key]||false;
       const priceNum=parseFloat((item.price||'').replace(/[^0-9.]/g,''))||0;
       totalPrice+=priceNum;
+      const checkHtml=item.check?`<div style="font-size:9px;color:var(--orange);margin-top:3px;line-height:1.3">⚠ ${item.check}</div>`:'';
       html+=`
         <div class="shop-item ${bought?'bought':''}" onclick="toggleShopItem('${key}')">
           <div class="shop-check">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <span class="shop-name">${item.name}<br><span style="font-size:10px;color:var(--text3)">${item.usage}</span></span>
+          <span class="shop-name">${item.name}
+            <br><span style="font-size:10px;color:var(--text3)">${item.usage}</span>
+            ${checkHtml}
+          </span>
           <span class="shop-qty">${item.qty}</span>
           <span class="shop-price">${item.price}</span>
         </div>`;
@@ -861,7 +954,7 @@ function renderShop(){
   });
   document.getElementById('shopList').innerHTML=html;
   document.getElementById('shopWeek').textContent=CURRENT_WEEK+1;
-  document.getElementById('shopTotal').innerHTML=`Budget semaine : <span>~${Math.round(totalPrice)}€</span> (Grand Frais) + ~50€ Marie Blachère`;
+  document.getElementById('shopTotal').innerHTML=`Budget courses : <span>~${Math.round(totalPrice)}€</span> + ~50€ Marie Blachère`;
 }
 
 function toggleShopItem(key){state.shopBought[key]=!state.shopBought[key];saveState();renderShop()}
