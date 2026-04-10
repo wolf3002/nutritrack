@@ -423,16 +423,16 @@ const LUNCHES = [
 // 7 dîners — LÉGERS car midi = ~1500 kcal. Focus protéine + légumes, peu de féculents.
 const DINNERS = [
   {
-    name:'Poulet grillé + brocoli sauté',
-    foods:[{n:'Filet de poulet',q:'200g'},{n:'Brocoli',q:'200g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Ail, curcuma',q:''}],
-    prot:49, cal:350,
-    recipe:'Poulet en lanières saisi 5 min feu vif. Brocoli sauté 5 min avec ail + curcuma. C\'est tout.'
+    name:'Poulet grillé + brocoli + lentilles',
+    foods:[{n:'Filet de poulet',q:'200g'},{n:'Brocoli',q:'200g'},{n:'Lentilles vertes (sec)',q:'60g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Ail, curcuma',q:''}],
+    prot:58, cal:480,
+    recipe:'Lentilles 20 min à l\'eau. Poulet en lanières saisi 5 min. Brocoli sauté 5 min avec ail.'
   },
   {
-    name:'Cabillaud au citron + épinards',
-    foods:[{n:'Filet de cabillaud',q:'200g'},{n:'Épinards frais',q:'250g'},{n:'Citron',q:'1/2'},{n:'Ail',q:'1 gousse'},{n:'Huile d\'olive',q:'1 cs'}],
-    prot:42, cal:280,
-    recipe:'Cabillaud poêlé 4 min/face. Épinards tombés 2 min à l\'ail. Citron sur le poisson.'
+    name:'Cabillaud + épinards + quinoa',
+    foods:[{n:'Filet de cabillaud',q:'200g'},{n:'Épinards frais',q:'200g'},{n:'Quinoa (sec)',q:'60g'},{n:'Citron',q:'1/2'},{n:'Ail',q:'1 gousse'}],
+    prot:48, cal:400,
+    recipe:'Quinoa 12 min. Cabillaud poêlé 4 min/face. Épinards tombés 2 min à l\'ail. Citron.'
   },
   {
     name:'Steak haché + haricots verts',
@@ -441,10 +441,10 @@ const DINNERS = [
     recipe:'Steak saisi avec oignon émincé 5 min. Haricots verts vapeur ou poêlés 8 min.'
   },
   {
-    name:'Saumon + courgettes au soja',
-    foods:[{n:'Pavé de saumon',q:'150g'},{n:'Courgettes',q:'250g'},{n:'Sauce soja',q:'1 cs'},{n:'Gingembre frais',q:'1 cm'}],
-    prot:35, cal:370,
-    recipe:'Saumon poêlé 4 min/face. Courgettes en rondelles sautées au wok 5 min avec soja + gingembre.'
+    name:'Saumon + courgettes + riz',
+    foods:[{n:'Pavé de saumon',q:'180g'},{n:'Courgettes',q:'200g'},{n:'Riz complet (sec)',q:'60g'},{n:'Sauce soja',q:'1 cs'},{n:'Gingembre frais',q:'1 cm'}],
+    prot:42, cal:500,
+    recipe:'Riz 25 min. Saumon poêlé 4 min/face. Courgettes sautées au wok 5 min avec soja + gingembre.'
   },
   {
     name:'Dinde + poivrons sautés',
@@ -453,16 +453,16 @@ const DINNERS = [
     recipe:'Dinde en morceaux saisie 5 min feu vif. Poivrons en lanières sautés 5 min. Paprika + cumin.'
   },
   {
-    name:'Filet mignon + salade composée',
-    foods:[{n:'Filet mignon de porc',q:'200g'},{n:'Salade mélangée',q:'100g'},{n:'Tomate',q:'1'},{n:'Concombre',q:'1/2'},{n:'Huile olive + vinaigre',q:'vinaigrette'}],
-    prot:44, cal:320,
-    recipe:'Filet mignon tranché, saisi 5 min. Salade + tomate + concombre en vinaigrette.'
+    name:'Filet mignon + haricots rouges + salade',
+    foods:[{n:'Filet mignon de porc',q:'200g'},{n:'Haricots rouges (conserve)',q:'150g'},{n:'Salade mélangée',q:'100g'},{n:'Tomate',q:'1'},{n:'Huile olive + vinaigre',q:'vinaigrette'}],
+    prot:52, cal:460,
+    recipe:'Filet mignon tranché, saisi 5 min. Haricots rouges réchauffés 3 min. Salade en vinaigrette.'
   },
   {
-    name:'Truite au four + asperges',
-    foods:[{n:'Filet de truite',q:'200g'},{n:'Asperges vertes',q:'1 botte (~200g)'},{n:'Citron',q:'1/2'},{n:'Persil frais',q:''}],
-    prot:43, cal:300,
-    recipe:'Truite + asperges sur plaque au four 15 min à 200°C. Citron + persil frais.'
+    name:'Truite + pois chiches + asperges',
+    foods:[{n:'Filet de truite',q:'200g'},{n:'Pois chiches (conserve)',q:'150g'},{n:'Asperges vertes',q:'1 botte (~200g)'},{n:'Citron',q:'1/2'},{n:'Persil frais',q:''}],
+    prot:50, cal:430,
+    recipe:'Truite + asperges au four 15 min à 200°C. Pois chiches poêlés 3 min au paprika. Citron + persil.'
   },
 ];
 
@@ -703,10 +703,8 @@ function getMealsForDay(dayIdx){
   meals.push({id:`${dayKey}-lu`,name:lu.name,time:'12h30',prot:lu.prot,cal:lu.cal,
     foods:lu.foods.map(f=>({name:f.n,qty:f.q})),supps:null,timeRange:[11,14]});
 
-  // Collation
-  const sn=SNACKS[plan.snack];
-  meals.push({id:`${dayKey}-sn`,name:sn.name,time:'16h00',prot:sn.prot,cal:sn.cal,
-    foods:sn.foods.map(f=>({name:f.n,qty:f.q})),supps:null,timeRange:[15,17]});
+  // Post-training whey (only on training days, replaces old collation)
+  // Pas de collation 16h — Valentin ne mange rien à ce moment
 
   // Dîner
   const di=DINNERS[plan.dinner];
@@ -714,12 +712,10 @@ function getMealsForDay(dayIdx){
     foods:di.foods.map(f=>({name:f.n,qty:f.q})),supps:'Magnésium Taurine B6 — 2 gélules à 21h30',
     recipe:di.recipe,timeRange:[18,22]});
 
-  // Snack soir (repos days, for extra protein)
-  if(type==='off'){
-    meals.push({id:`${dayKey}-ev`,name:'Snack soir',time:'21h00',prot:15,cal:150,
-      foods:[{name:'Fromage blanc 0%',qty:'150g'},{name:'Graines de courge',qty:'15g'}],
-      supps:'Magnésium Taurine B6 — 2 gélules',timeRange:[20,22]});
-  }
+  // Snack soir — tous les jours pour compléter les protéines (pas de collation 16h)
+  meals.push({id:`${dayKey}-ev`,name:'Snack soir protéiné',time:'21h00',prot:22,cal:200,
+    foods:[{name:'Fromage blanc 0%',qty:'200g'},{name:'Whey nature (si jour off)',qty:type==='off'?'15g':'—'},{name:'Graines de courge',qty:'15g'}],
+    supps:'Magnésium Taurine B6 — 2 gélules',timeRange:[20,22]});
 
   return meals;
 }
