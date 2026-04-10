@@ -245,7 +245,7 @@ body{padding-bottom:80px}
 <div id="page-today" class="page active">
   <div class="header">
     <h1>NutriTrack</h1>
-    <div class="subtitle">Objectif : physique athlétique</div>
+    <div class="subtitle">Objectif : physique athlétique <span class="week-badge" id="weekBadge"></span></div>
     <div class="date-label" id="dateLabel"></div>
   </div>
 
@@ -294,7 +294,7 @@ body{padding-bottom:80px}
 <div id="page-shop" class="page">
   <div class="header">
     <h1>Courses de la semaine</h1>
-    <div class="subtitle">Grand Frais — basé sur tes repas</div>
+    <div class="subtitle">Grand Frais — Semaine <span id="shopWeek"></span>/4</div>
   </div>
   <div id="shopList"></div>
   <div class="shop-total" id="shopTotal"></div>
@@ -359,221 +359,176 @@ body{padding-bottom:80px}
 // ═══════════════════════════════════════════════════════════════
 
 // 3 variantes petit-déj — ALLÉGÉS car midi Marie Blachère = ~1500 kcal
-const BREAKFASTS = [
-  {
-    name:'Oeufs brouillés + fromage blanc',
-    foods:[{n:'Oeufs brouillés',q:'3'},{n:'Fromage blanc 0%',q:'150g'}],
-    prot:33, cal:300,
-    supps:'Créatine 5g + D3K2 3 gouttes (sur les oeufs)'
-  },
-  {
-    name:'Oeufs au plat + avocat',
-    foods:[{n:'Oeufs au plat',q:'3'},{n:'Avocat',q:'1/2'}],
-    prot:24, cal:350,
-    supps:'Créatine 5g + D3K2 3 gouttes'
-  },
-  {
-    name:'Overnight oats protéinés',
-    foods:[{n:'Flocons d\'avoine',q:'50g'},{n:'Fromage blanc 0%',q:'150g'},{n:'Whey nature',q:'25g'},{n:'Banane',q:'1'}],
-    prot:40, cal:420,
-    supps:'Créatine 5g + D3K2 3 gouttes (dans un verre)'
-  },
-];
-
-// 7 déjeuners — Lun-Ven achetés chez Marie Blachère, weekend maison
-// Combo type : ~3 produits, ~1400-1500 kcal, ~60-70g protéines
-const LUNCHES = [
-  {
-    name:'MB — Maïstik + Wrap crispy + Sandwich crudités',
-    foods:[{n:'Club Maïstik (poulet, mayo, pain maïs)',q:'1 (~250g)'},{n:'Wrap poulet crispy',q:'1 (~200g)'},{n:'Sandwich crudités (poulet)',q:'1 (~250g)'}],
-    prot:69, cal:1480
-  },
-  {
-    name:'MB — 2x Maïstik + Wrap crispy',
-    foods:[{n:'Club Maïstik',q:'2 (~500g)'},{n:'Wrap poulet crispy',q:'1 (~200g)'}],
-    prot:66, cal:1530
-  },
-  {
-    name:'MB — Maïstik + Wrap thon + Sandwich crudités',
-    foods:[{n:'Club Maïstik',q:'1'},{n:'Wrap thon',q:'1 (~200g)'},{n:'Sandwich crudités (thon)',q:'1 (~250g)'}],
-    prot:65, cal:1430
-  },
-  {
-    name:'MB — Wrap crispy + Wrap thon + Maïstik',
-    foods:[{n:'Wrap poulet crispy',q:'1'},{n:'Wrap thon',q:'1'},{n:'Club Maïstik',q:'1'}],
-    prot:64, cal:1400
-  },
-  {
-    name:'MB — 2x Maïstik + Sandwich crudités',
-    foods:[{n:'Club Maïstik',q:'2'},{n:'Sandwich crudités (poulet)',q:'1'}],
-    prot:69, cal:1600
-  },
-  {
-    name:'Weekend — Omelette garnie maison',
-    foods:[{n:'Oeufs',q:'4'},{n:'Jambon blanc',q:'2 tranches'},{n:'Emmental râpé',q:'30g'},{n:'Salade verte',q:'garniture'},{n:'Pain complet',q:'1 tranche'}],
-    prot:45, cal:550
-  },
-  {
-    name:'Weekend — Poulet riz express',
-    foods:[{n:'Filet de poulet',q:'200g'},{n:'Riz basmati',q:'80g (sec)'},{n:'Courgette sautée',q:'150g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Sauce soja',q:'1 cs'}],
-    prot:52, cal:580
-  },
-];
-
-// 7 dîners — LÉGERS car midi = ~1500 kcal. Focus protéine + légumes, peu de féculents.
-const DINNERS = [
-  {
-    name:'Poulet grillé + brocoli + lentilles',
-    foods:[{n:'Filet de poulet',q:'200g'},{n:'Brocoli',q:'200g'},{n:'Lentilles vertes (sec)',q:'60g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Ail, curcuma',q:''}],
-    prot:58, cal:480,
-    recipe:'Lentilles 20 min à l\'eau. Poulet en lanières saisi 5 min. Brocoli sauté 5 min avec ail.'
-  },
-  {
-    name:'Cabillaud + épinards + quinoa',
-    foods:[{n:'Filet de cabillaud',q:'200g'},{n:'Épinards frais',q:'200g'},{n:'Quinoa (sec)',q:'60g'},{n:'Citron',q:'1/2'},{n:'Ail',q:'1 gousse'}],
-    prot:48, cal:400,
-    recipe:'Quinoa 12 min. Cabillaud poêlé 4 min/face. Épinards tombés 2 min à l\'ail. Citron.'
-  },
-  {
-    name:'Steak haché + haricots verts',
-    foods:[{n:'Steak haché 5%',q:'200g'},{n:'Haricots verts',q:'200g'},{n:'Oignon',q:'1'},{n:'Herbes de Provence',q:''}],
-    prot:48, cal:360,
-    recipe:'Steak saisi avec oignon émincé 5 min. Haricots verts vapeur ou poêlés 8 min.'
-  },
-  {
-    name:'Saumon + courgettes + riz',
-    foods:[{n:'Pavé de saumon',q:'180g'},{n:'Courgettes',q:'200g'},{n:'Riz complet (sec)',q:'60g'},{n:'Sauce soja',q:'1 cs'},{n:'Gingembre frais',q:'1 cm'}],
-    prot:42, cal:500,
-    recipe:'Riz 25 min. Saumon poêlé 4 min/face. Courgettes sautées au wok 5 min avec soja + gingembre.'
-  },
-  {
-    name:'Dinde + poivrons sautés',
-    foods:[{n:'Escalope de dinde',q:'200g'},{n:'Poivrons (rouge+jaune)',q:'250g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Paprika, cumin',q:''}],
-    prot:50, cal:330,
-    recipe:'Dinde en morceaux saisie 5 min feu vif. Poivrons en lanières sautés 5 min. Paprika + cumin.'
-  },
-  {
-    name:'Filet mignon + haricots rouges + salade',
-    foods:[{n:'Filet mignon de porc',q:'200g'},{n:'Haricots rouges (conserve)',q:'150g'},{n:'Salade mélangée',q:'100g'},{n:'Tomate',q:'1'},{n:'Huile olive + vinaigre',q:'vinaigrette'}],
-    prot:52, cal:460,
-    recipe:'Filet mignon tranché, saisi 5 min. Haricots rouges réchauffés 3 min. Salade en vinaigrette.'
-  },
-  {
-    name:'Truite + pois chiches + asperges',
-    foods:[{n:'Filet de truite',q:'200g'},{n:'Pois chiches (conserve)',q:'150g'},{n:'Asperges vertes',q:'1 botte (~200g)'},{n:'Citron',q:'1/2'},{n:'Persil frais',q:''}],
-    prot:50, cal:430,
-    recipe:'Truite + asperges au four 15 min à 200°C. Pois chiches poêlés 3 min au paprika. Citron + persil.'
-  },
-];
-
-// Collations (2 variantes : post-training et repos)
-const SNACK_TRAINING = {
-  name:'Post-training',time:'9h00',
-  foods:[{n:'Whey Isolate Native',q:'25g (1 dose)'},{n:'Eau',q:'250ml'}],
-  prot:24, cal:100
-};
-
-const SNACKS = [
-  {name:'Grisons + amandes',foods:[{n:'Viande des Grisons',q:'30g'},{n:'Amandes nature',q:'25g'},{n:'Kiwi',q:'1'}],prot:18,cal:250},
-  {name:'Fromage blanc + graines',foods:[{n:'Fromage blanc 0%',q:'200g'},{n:'Graines de courge',q:'20g'},{n:'Miel',q:'1 cc'}],prot:20,cal:200},
-  {name:'Oeuf dur + noix',foods:[{n:'Oeufs durs',q:'2'},{n:'Noix',q:'20g'},{n:'Pomme',q:'1'}],prot:17,cal:280},
-  {name:'Whey + banane',foods:[{n:'Whey Isolate Native',q:'25g'},{n:'Banane',q:'1'}],prot:26,cal:190},
-  {name:'Bresaola + parmesan',foods:[{n:'Bresaola',q:'40g'},{n:'Parmesan',q:'15g'},{n:'Tomate cerise',q:'5'}],prot:20,cal:170},
-  {name:'Cacahuètes + chocolat noir',foods:[{n:'Cacahuètes nature',q:'30g'},{n:'Chocolat noir 70%',q:'2 carrés (20g)'}],prot:11,cal:250},
-  {name:'Cottage cheese + fruit',foods:[{n:'Cottage cheese',q:'150g'},{n:'Myrtilles',q:'80g'}],prot:19,cal:190},
-];
-
-const EVENING_SNACK = {
-  name:'Snack soir (si besoin)',time:'21h00',
-  foods:[{n:'Fromage blanc 0%',q:'150g'},{n:'Graines de courge',q:'15g'}],
-  prot:15, cal:150,
-  supps:'Magnésium Taurine B6 — 2 gélules'
-};
-
-// Jour de la semaine → index dans les tableaux
-// breakfastIndex: 0=oeufs brouillés, 1=oeufs au plat, 2=overnight
-const WEEK_PLAN = [
-  {day:'Lun', bk:0, lunch:0, dinner:0, snack:0},
-  {day:'Mar', bk:1, lunch:1, dinner:1, snack:1},
-  {day:'Mer', bk:2, lunch:2, dinner:2, snack:2},
-  {day:'Jeu', bk:0, lunch:3, dinner:3, snack:3},
-  {day:'Ven', bk:1, lunch:4, dinner:4, snack:4},
-  {day:'Sam', bk:2, lunch:5, dinner:5, snack:5},
-  {day:'Dim', bk:0, lunch:6, dinner:6, snack:6},
-];
-
 // ═══════════════════════════════════════════════════════════════
-// LISTE DE COURSES — cohérente avec les repas de la semaine
+// 4 SEMAINES EN ROTATION — change automatiquement chaque lundi
 // ═══════════════════════════════════════════════════════════════
-const SHOPPING = [
-  {section:'Boucherie (Grand Frais)',items:[
-    {name:'Filets de poulet',qty:'400g',price:'5€',usage:'Dîner lundi'},
-    {name:'Escalopes de dinde',qty:'400g',price:'6€',usage:'Dîner vendredi'},
-    {name:'Steak haché 5%',qty:'400g',price:'5€',usage:'Dîner mercredi'},
-    {name:'Filet mignon de porc',qty:'300g',price:'5€',usage:'Dîner samedi'},
-    {name:'Jambon blanc supérieur',qty:'4 tranches',price:'2€',usage:'Omelette weekend'},
-    {name:'Viande des Grisons',qty:'1 paquet',price:'3€',usage:'Collation lundi'},
-    {name:'Bresaola',qty:'1 paquet',price:'4€',usage:'Collation vendredi'},
+
+const ALL_BREAKFASTS = [
+  {name:'Oeufs brouillés + fromage blanc',foods:[{n:'Oeufs brouillés',q:'3'},{n:'Fromage blanc 0%',q:'150g'}],prot:33,cal:300,supps:'Créatine 5g + D3K2 3 gouttes (sur les oeufs)'},
+  {name:'Oeufs au plat + avocat',foods:[{n:'Oeufs au plat',q:'3'},{n:'Avocat',q:'1/2'}],prot:24,cal:350,supps:'Créatine 5g + D3K2 3 gouttes'},
+  {name:'Overnight oats protéinés',foods:[{n:'Flocons d\'avoine',q:'50g'},{n:'Fromage blanc 0%',q:'150g'},{n:'Whey nature',q:'25g'},{n:'Banane',q:'1'}],prot:40,cal:420,supps:'Créatine 5g + D3K2 3 gouttes (dans un verre)'},
+  {name:'Omelette fromage + pain complet',foods:[{n:'Oeufs',q:'3'},{n:'Emmental râpé',q:'20g'},{n:'Pain complet',q:'1 tranche'}],prot:28,cal:350,supps:'Créatine 5g + D3K2 3 gouttes'},
+];
+
+const ALL_LUNCHES = [
+  // Marie Blachère combos (indices 0-6)
+  {name:'MB — Maïstik + Wrap crispy + Sandwich crudités poulet',foods:[{n:'Club Maïstik',q:'1'},{n:'Wrap poulet crispy',q:'1'},{n:'Sandwich crudités poulet',q:'1'}],prot:69,cal:1480},
+  {name:'MB — 2x Maïstik + Wrap crispy',foods:[{n:'Club Maïstik',q:'2'},{n:'Wrap poulet crispy',q:'1'}],prot:66,cal:1530},
+  {name:'MB — Maïstik + Wrap thon + Sandwich crudités thon',foods:[{n:'Club Maïstik',q:'1'},{n:'Wrap thon',q:'1'},{n:'Sandwich crudités thon',q:'1'}],prot:65,cal:1430},
+  {name:'MB — Wrap crispy + Wrap thon + Maïstik',foods:[{n:'Wrap poulet crispy',q:'1'},{n:'Wrap thon',q:'1'},{n:'Club Maïstik',q:'1'}],prot:64,cal:1400},
+  {name:'MB — 2x Maïstik + Sandwich crudités',foods:[{n:'Club Maïstik',q:'2'},{n:'Sandwich crudités poulet',q:'1'}],prot:69,cal:1600},
+  {name:'MB — Maïstik + 2x Wrap crispy',foods:[{n:'Club Maïstik',q:'1'},{n:'Wrap poulet crispy',q:'2'}],prot:66,cal:1410},
+  {name:'MB — 2x Wrap crispy + Sandwich crudités thon',foods:[{n:'Wrap poulet crispy',q:'2'},{n:'Sandwich crudités thon',q:'1'}],prot:67,cal:1360},
+  // Weekend maison (indices 7-10)
+  {name:'Weekend — Omelette garnie',foods:[{n:'Oeufs',q:'4'},{n:'Jambon blanc',q:'2 tranches'},{n:'Emmental',q:'30g'},{n:'Salade',q:'garniture'}],prot:45,cal:550},
+  {name:'Weekend — Poulet riz sauté',foods:[{n:'Filet de poulet',q:'200g'},{n:'Riz basmati',q:'80g (sec)'},{n:'Courgette',q:'150g'},{n:'Sauce soja',q:'1 cs'}],prot:52,cal:580},
+  {name:'Weekend — Steak haché pâtes',foods:[{n:'Steak haché 5%',q:'200g'},{n:'Pâtes complètes',q:'80g (sec)'},{n:'Sauce tomate',q:'100g'},{n:'Parmesan',q:'15g'}],prot:52,cal:600},
+  {name:'Weekend — Crevettes quinoa',foods:[{n:'Crevettes cuites',q:'200g'},{n:'Quinoa cuit',q:'100g'},{n:'Avocat',q:'1/2'},{n:'Tomate',q:'1'},{n:'Citron',q:'filet'}],prot:48,cal:500},
+];
+
+// 28 dîners — 7 par semaine, 4 semaines différentes
+const ALL_DINNERS = [
+  // SEMAINE 1 — Classiques
+  {name:'Poulet + brocoli + lentilles',foods:[{n:'Filet de poulet',q:'200g'},{n:'Brocoli',q:'200g'},{n:'Lentilles (sec)',q:'60g'},{n:'Ail, curcuma',q:''}],prot:58,cal:480,recipe:'Lentilles 20 min. Poulet saisi 5 min. Brocoli sauté 5 min à l\'ail.'},
+  {name:'Cabillaud + épinards + quinoa',foods:[{n:'Cabillaud',q:'200g'},{n:'Épinards',q:'200g'},{n:'Quinoa (sec)',q:'60g'},{n:'Citron',q:'1/2'}],prot:48,cal:400,recipe:'Quinoa 12 min. Cabillaud poêlé 4 min/face. Épinards tombés à l\'ail.'},
+  {name:'Steak haché + haricots verts',foods:[{n:'Steak haché 5%',q:'200g'},{n:'Haricots verts',q:'200g'},{n:'Oignon',q:'1'}],prot:48,cal:360,recipe:'Steak saisi avec oignon 5 min. Haricots verts poêlés 8 min.'},
+  {name:'Saumon + courgettes + riz',foods:[{n:'Pavé de saumon',q:'180g'},{n:'Courgettes',q:'200g'},{n:'Riz complet (sec)',q:'60g'},{n:'Sauce soja + gingembre',q:''}],prot:42,cal:500,recipe:'Riz 25 min. Saumon poêlé 4 min/face. Courgettes au wok.'},
+  {name:'Dinde + poivrons',foods:[{n:'Escalope de dinde',q:'200g'},{n:'Poivrons',q:'250g'},{n:'Paprika, cumin',q:''}],prot:50,cal:330,recipe:'Dinde saisie 5 min. Poivrons sautés 5 min. Épices.'},
+  {name:'Filet mignon + haricots rouges',foods:[{n:'Filet mignon',q:'200g'},{n:'Haricots rouges (conserve)',q:'150g'},{n:'Salade + tomate',q:'garniture'}],prot:52,cal:460,recipe:'Filet mignon tranché, saisi 5 min. Haricots réchauffés. Salade.'},
+  {name:'Truite + pois chiches + asperges',foods:[{n:'Truite',q:'200g'},{n:'Pois chiches (conserve)',q:'150g'},{n:'Asperges',q:'200g'},{n:'Citron',q:'1/2'}],prot:50,cal:430,recipe:'Truite + asperges au four 15 min. Pois chiches poêlés au paprika.'},
+  // SEMAINE 2 — Nouvelles protéines
+  {name:'Escalope veau + champignons',foods:[{n:'Escalope de veau',q:'200g'},{n:'Champignons de Paris',q:'250g'},{n:'Crème fraîche légère',q:'1 cs'},{n:'Persil',q:''}],prot:48,cal:370,recipe:'Veau saisi 3 min/face. Champignons sautés 5 min. Crème + persil.'},
+  {name:'Lieu noir + chou-fleur rôti',foods:[{n:'Lieu noir',q:'200g'},{n:'Chou-fleur',q:'250g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Curcuma',q:''}],prot:42,cal:300,recipe:'Chou-fleur en fleurettes au four 20 min. Lieu noir poêlé 4 min/face.'},
+  {name:'Rumsteck + patate douce',foods:[{n:'Rumsteck',q:'200g'},{n:'Patate douce',q:'200g'},{n:'Épinards',q:'100g'}],prot:50,cal:430,recipe:'Patate douce en cubes 15 min vapeur. Rumsteck saisi 3 min/face. Épinards tombés.'},
+  {name:'Maquereau + boulgour + tomates',foods:[{n:'Maquereau (filet)',q:'180g'},{n:'Boulgour (sec)',q:'60g'},{n:'Tomates cerises',q:'200g'},{n:'Basilic',q:''}],prot:42,cal:460,recipe:'Boulgour 10 min. Maquereau poêlé 3 min/face. Tomates sautées + basilic.'},
+  {name:'Poulet curry + courgettes',foods:[{n:'Filet de poulet',q:'200g'},{n:'Courgettes',q:'250g'},{n:'Lait de coco',q:'50ml'},{n:'Curry, curcuma',q:''}],prot:48,cal:400,recipe:'Poulet saisi 5 min. Courgettes 5 min. Lait de coco + épices 2 min.'},
+  {name:'Lapin + haricots verts + moutarde',foods:[{n:'Lapin (râble ou cuisse)',q:'200g'},{n:'Haricots verts',q:'200g'},{n:'Moutarde',q:'1 cs'}],prot:46,cal:350,recipe:'Lapin saisi 5 min, moutarde badigeonnée, four 15 min. Haricots vapeur.'},
+  {name:'Daurade + fenouil + pois chiches',foods:[{n:'Daurade (filet)',q:'200g'},{n:'Fenouil',q:'200g'},{n:'Pois chiches (conserve)',q:'150g'},{n:'Citron',q:'1/2'}],prot:46,cal:400,recipe:'Daurade au four 12 min. Fenouil émincé rôti 15 min. Pois chiches réchauffés.'},
+  // SEMAINE 3 — Saveurs différentes
+  {name:'Dinde teriyaki + brocoli',foods:[{n:'Escalope de dinde',q:'200g'},{n:'Brocoli',q:'200g'},{n:'Sauce soja',q:'2 cs'},{n:'Miel',q:'1 cc'},{n:'Gingembre',q:''}],prot:50,cal:370,recipe:'Dinde marinée soja+miel+gingembre 5 min. Saisie 5 min. Brocoli vapeur.'},
+  {name:'Colin + ratatouille express',foods:[{n:'Colin',q:'200g'},{n:'Courgette',q:'1'},{n:'Aubergine',q:'1/2'},{n:'Poivron',q:'1'},{n:'Tomate',q:'1'},{n:'Herbes de Provence',q:''}],prot:40,cal:320,recipe:'Légumes en cubes sautés 10 min. Colin poêlé 4 min/face. Herbes.'},
+  {name:'Bavette + oignons + salade',foods:[{n:'Bavette d\'aloyau',q:'200g'},{n:'Oignons',q:'2'},{n:'Salade verte',q:'garniture'},{n:'Vinaigre balsamique',q:'filet'}],prot:46,cal:400,recipe:'Oignons émincés caramélisés 10 min. Bavette saisie 2 min/face. Salade.'},
+  {name:'Truite + lentilles corail',foods:[{n:'Truite',q:'200g'},{n:'Lentilles corail (sec)',q:'60g'},{n:'Tomates concassées',q:'100g'},{n:'Cumin',q:''}],prot:48,cal:420,recipe:'Lentilles corail 10 min avec tomate+cumin. Truite poêlée 4 min/face.'},
+  {name:'Poulet + aubergines + feta',foods:[{n:'Filet de poulet',q:'200g'},{n:'Aubergines',q:'250g'},{n:'Feta',q:'30g'},{n:'Menthe fraîche',q:''}],prot:52,cal:420,recipe:'Aubergines en tranches grillées 8 min. Poulet saisi 5 min. Feta émiettée + menthe.'},
+  {name:'Onglet + champignons + échalotes',foods:[{n:'Onglet de boeuf',q:'200g'},{n:'Champignons',q:'200g'},{n:'Échalotes',q:'2'}],prot:48,cal:380,recipe:'Onglet saisi 2 min/face. Champignons + échalotes sautés 5 min. Déglacer vinaigre.'},
+  {name:'Crevettes + wok légumes + soja',foods:[{n:'Crevettes décortiquées',q:'200g'},{n:'Courgette + poivron + carotte',q:'300g total'},{n:'Sauce soja',q:'1 cs'},{n:'Ail',q:''}],prot:44,cal:300,recipe:'Légumes en julienne au wok 5 min. Crevettes 3 min. Sauce soja + ail.'},
+  // SEMAINE 4 — Comfort food light
+  {name:'Poulet moutarde + brocoli',foods:[{n:'Filet de poulet',q:'200g'},{n:'Brocoli',q:'200g'},{n:'Moutarde à l\'ancienne',q:'1 cs'},{n:'Crème fraîche légère',q:'1 cs'}],prot:50,cal:380,recipe:'Poulet saisi 5 min. Sauce moutarde+crème. Brocoli vapeur.'},
+  {name:'Pavé de thon + haricots verts',foods:[{n:'Pavé de thon frais',q:'180g'},{n:'Haricots verts',q:'200g'},{n:'Sésame',q:'1 cs'},{n:'Sauce soja',q:'1 cs'}],prot:50,cal:320,recipe:'Thon saisi 1-2 min/face (rosé). Haricots vapeur. Sésame + soja.'},
+  {name:'Filet mignon miel-moutarde + carottes',foods:[{n:'Filet mignon',q:'200g'},{n:'Carottes',q:'250g'},{n:'Miel',q:'1 cc'},{n:'Moutarde',q:'1 cs'}],prot:46,cal:400,recipe:'Filet mignon badigeonné miel+moutarde, four 20 min. Carottes vapeur.'},
+  {name:'Saumon + purée de patate douce',foods:[{n:'Pavé de saumon',q:'180g'},{n:'Patate douce',q:'200g'},{n:'Épinards',q:'100g'}],prot:40,cal:480,recipe:'Patate douce cuite 15 min, écrasée. Saumon poêlé 4 min/face. Épinards.'},
+  {name:'Dinde + courgettes + pesto',foods:[{n:'Escalope de dinde',q:'200g'},{n:'Courgettes',q:'250g'},{n:'Pesto',q:'1 cs'}],prot:50,cal:380,recipe:'Dinde saisie 5 min. Courgettes en rondelles grillées 5 min. Pesto.'},
+  {name:'Rumsteck + poêlée champignons-épinards',foods:[{n:'Rumsteck',q:'200g'},{n:'Champignons',q:'150g'},{n:'Épinards',q:'150g'},{n:'Ail',q:'1 gousse'}],prot:52,cal:370,recipe:'Rumsteck saisi 3 min/face. Champignons 5 min + épinards tombés + ail.'},
+  {name:'Lotte + poireaux + quinoa',foods:[{n:'Lotte',q:'200g'},{n:'Poireaux',q:'200g'},{n:'Quinoa (sec)',q:'60g'},{n:'Citron',q:'1/2'}],prot:44,cal:380,recipe:'Quinoa 12 min. Poireaux fondus 10 min. Lotte poêlée 5 min. Citron.'},
+];
+
+// 4 plans de semaine — rotation automatique
+const WEEK_PLANS = [
+  // Semaine 1
+  [{bk:0,lunch:0,dinner:0},{bk:1,lunch:1,dinner:1},{bk:2,lunch:2,dinner:2},{bk:0,lunch:3,dinner:3},{bk:1,lunch:4,dinner:4},{bk:2,lunch:7,dinner:5},{bk:3,lunch:8,dinner:6}],
+  // Semaine 2
+  [{bk:1,lunch:5,dinner:7},{bk:2,lunch:0,dinner:8},{bk:0,lunch:6,dinner:9},{bk:3,lunch:1,dinner:10},{bk:1,lunch:3,dinner:11},{bk:0,lunch:9,dinner:12},{bk:2,lunch:10,dinner:13}],
+  // Semaine 3
+  [{bk:2,lunch:2,dinner:14},{bk:0,lunch:4,dinner:15},{bk:3,lunch:5,dinner:16},{bk:1,lunch:0,dinner:17},{bk:0,lunch:6,dinner:18},{bk:2,lunch:7,dinner:19},{bk:3,lunch:8,dinner:20}],
+  // Semaine 4
+  [{bk:0,lunch:1,dinner:21},{bk:3,lunch:3,dinner:22},{bk:1,lunch:2,dinner:23},{bk:2,lunch:4,dinner:24},{bk:0,lunch:5,dinner:25},{bk:1,lunch:9,dinner:26},{bk:3,lunch:10,dinner:27}],
+];
+
+// Quelle semaine sommes-nous ? (basé sur le numéro de semaine de l'année, modulo 4)
+function getCurrentWeekIndex(){
+  const now=new Date();
+  const start=new Date(now.getFullYear(),0,1);
+  const weekNum=Math.ceil(((now-start)/86400000+start.getDay()+1)/7);
+  return weekNum%4;
+}
+
+// Shopping lists par semaine — cohérentes avec les dîners
+const ALL_SHOPPING = [
+  // SEMAINE 1
+  [
+    {section:'Boucherie',items:[
+      {name:'Filets de poulet',qty:'400g',price:'5€',usage:'Dîner lun + weekend'},
+      {name:'Escalopes de dinde',qty:'200g',price:'3€',usage:'Dîner ven'},
+      {name:'Steak haché 5%',qty:'200g',price:'3€',usage:'Dîner mer'},
+      {name:'Filet mignon de porc',qty:'200g',price:'4€',usage:'Dîner sam'},
+      {name:'Jambon blanc',qty:'4 tranches',price:'2€',usage:'Weekend'},
+    ]},
+    {section:'Poissonnerie',items:[
+      {name:'Cabillaud (filets)',qty:'200g',price:'5€',usage:'Dîner mar'},
+      {name:'Pavé de saumon',qty:'180g',price:'5€',usage:'Dîner jeu'},
+      {name:'Truite (filets)',qty:'200g',price:'4€',usage:'Dîner dim'},
+    ]},
+  ],
+  // SEMAINE 2
+  [
+    {section:'Boucherie',items:[
+      {name:'Escalope de veau',qty:'200g',price:'5€',usage:'Dîner lun'},
+      {name:'Rumsteck',qty:'200g',price:'5€',usage:'Dîner mer'},
+      {name:'Filets de poulet',qty:'400g',price:'5€',usage:'Dîner ven + weekend'},
+      {name:'Lapin (râble)',qty:'200g',price:'5€',usage:'Dîner sam'},
+    ]},
+    {section:'Poissonnerie',items:[
+      {name:'Lieu noir (filets)',qty:'200g',price:'4€',usage:'Dîner mar'},
+      {name:'Maquereau (filets)',qty:'180g',price:'4€',usage:'Dîner jeu'},
+      {name:'Daurade (filets)',qty:'200g',price:'5€',usage:'Dîner dim'},
+    ]},
+  ],
+  // SEMAINE 3
+  [
+    {section:'Boucherie',items:[
+      {name:'Escalopes de dinde',qty:'400g',price:'6€',usage:'Dîner lun'},
+      {name:'Bavette d\'aloyau',qty:'200g',price:'5€',usage:'Dîner mer'},
+      {name:'Filets de poulet',qty:'200g',price:'3€',usage:'Dîner ven'},
+      {name:'Onglet de boeuf',qty:'200g',price:'5€',usage:'Dîner sam'},
+    ]},
+    {section:'Poissonnerie',items:[
+      {name:'Colin (filets)',qty:'200g',price:'4€',usage:'Dîner mar'},
+      {name:'Truite (filets)',qty:'200g',price:'4€',usage:'Dîner jeu'},
+      {name:'Crevettes décortiquées',qty:'200g',price:'5€',usage:'Dîner dim'},
+    ]},
+  ],
+  // SEMAINE 4
+  [
+    {section:'Boucherie',items:[
+      {name:'Filets de poulet',qty:'200g',price:'3€',usage:'Dîner lun'},
+      {name:'Filet mignon de porc',qty:'200g',price:'4€',usage:'Dîner mer'},
+      {name:'Escalopes de dinde',qty:'200g',price:'3€',usage:'Dîner ven'},
+      {name:'Rumsteck',qty:'200g',price:'5€',usage:'Dîner sam'},
+    ]},
+    {section:'Poissonnerie',items:[
+      {name:'Pavé de thon frais',qty:'180g',price:'6€',usage:'Dîner mar'},
+      {name:'Pavé de saumon',qty:'180g',price:'5€',usage:'Dîner jeu'},
+      {name:'Lotte (filets)',qty:'200g',price:'7€',usage:'Dîner dim'},
+    ]},
+  ],
+];
+
+// Courses communes à toutes les semaines
+const COMMON_SHOPPING = [
+  {section:'Crèmerie (chaque semaine)',items:[
+    {name:'Oeufs',qty:'18',price:'5€',usage:'Petit-déj quotidien'},
+    {name:'Fromage blanc 0%',qty:'1.5 kg',price:'4€',usage:'Petit-déj + snack soir'},
+    {name:'Emmental râpé',qty:'100g',price:'2€',usage:'Omelette'},
   ]},
-  {section:'Poissonnerie (Grand Frais)',items:[
-    {name:'Cabillaud (filets)',qty:'200g',price:'5€',usage:'Dîner mardi'},
-    {name:'Pavé de saumon',qty:'180g',price:'5€',usage:'Dîner jeudi'},
-    {name:'Truite (filets)',qty:'200g',price:'4€',usage:'Dîner dimanche'},
-    {name:'Crevettes cuites',qty:'150g',price:'4€',usage:'Bowl samedi'},
-  ]},
-  {section:'Crèmerie / Fromagerie (Grand Frais)',items:[
-    {name:'Oeufs',qty:'18 (plaque)',price:'5€',usage:'Petit-déj quotidien + omelette weekend'},
-    {name:'Fromage blanc 0%',qty:'1.5 kg',price:'4€',usage:'Petit-déj + collations + snack soir'},
-    {name:'Emmental râpé',qty:'150g',price:'2€',usage:'Omelette + plats'},
-    {name:'Parmesan',qty:'50g',price:'2€',usage:'Collation vendredi'},
-    {name:'Feta',qty:'100g',price:'2€',usage:'Bowl samedi'},
-    {name:'Cottage cheese',qty:'1 pot',price:'2€',usage:'Collation dimanche'},
-  ]},
-  {section:'Fruits & Légumes (Grand Frais)',items:[
-    {name:'Brocoli',qty:'300g',price:'2€',usage:'Dîner lundi'},
-    {name:'Épinards frais',qty:'200g',price:'2€',usage:'Dîner mardi'},
-    {name:'Haricots verts',qty:'200g',price:'2€',usage:'Dîner mercredi'},
-    {name:'Courgettes',qty:'300g',price:'2€',usage:'Dîner jeudi'},
-    {name:'Poivrons rouge+jaune',qty:'2 pièces',price:'2€',usage:'Dîner vendredi'},
-    {name:'Asperges vertes',qty:'1 botte',price:'4€',usage:'Dîner dimanche'},
-    {name:'Patate douce',qty:'250g',price:'1€',usage:'Dîner mercredi'},
-    {name:'Salade verte',qty:'1 pièce',price:'1€',usage:'Omelette weekend + dîner'},
-    {name:'Tomates',qty:'500g',price:'2€',usage:'Dîner samedi + weekend'},
-    {name:'Tomates cerise',qty:'250g',price:'2€',usage:'Collation + bowl'},
-    {name:'Concombre',qty:'1 pièce',price:'1€',usage:'Bowl samedi'},
-    {name:'Avocats',qty:'3 pièces',price:'3€',usage:'Petit-déj mardi/vendredi'},
-    {name:'Bananes',qty:'1 kg (~6)',price:'2€',usage:'Petit-déj + collation'},
-    {name:'Pommes',qty:'500g',price:'2€',usage:'Collation'},
-    {name:'Kiwis',qty:'4 pièces',price:'2€',usage:'Petit-déj + collation'},
-    {name:'Citrons',qty:'3 pièces',price:'1€',usage:'Poisson + vinaigrette'},
-    {name:'Myrtilles',qty:'125g',price:'3€',usage:'Collation dimanche'},
+  {section:'Fruits & Légumes (selon la semaine)',items:[
+    {name:'Avocats',qty:'2-3',price:'3€',usage:'Petit-déj'},
+    {name:'Bananes',qty:'1 kg',price:'2€',usage:'Petit-déj + overnight oats'},
+    {name:'Citrons',qty:'3',price:'1€',usage:'Poisson'},
     {name:'Ail + oignons',qty:'1 tête + 2',price:'1€',usage:'Cuisine'},
-    {name:'Gingembre frais',qty:'1 morceau',price:'1€',usage:'Dîner jeudi'},
-    {name:'Persil frais',qty:'1 bouquet',price:'1€',usage:'Dîner dimanche'},
   ]},
-  {section:'Épicerie (Grand Frais)',items:[
-    {name:'Lentilles vertes',qty:'250g',price:'1€',usage:'Dîner lundi'},
-    {name:'Quinoa',qty:'250g',price:'2€',usage:'Dîner mardi + bowl'},
-    {name:'Riz complet',qty:'250g',price:'1€',usage:'Dîner jeudi'},
-    {name:'Boulgour',qty:'250g',price:'1€',usage:'Dîner vendredi'},
-    {name:'Pois chiches (conserve)',qty:'1 boîte',price:'1€',usage:'Dîner dimanche'},
-    {name:'Haricots rouges (conserve)',qty:'1 boîte',price:'1€',usage:'Dîner samedi'},
-    {name:'Flocons d\'avoine',qty:'300g',price:'1€',usage:'Overnight oats (mer+sam)'},
+  {section:'Épicerie (stock mensuel)',items:[
+    {name:'Flocons d\'avoine',qty:'500g',price:'2€',usage:'Overnight oats'},
     {name:'Pain complet',qty:'1 paquet',price:'3€',usage:'Petit-déj'},
-    {name:'Amandes nature',qty:'150g',price:'3€',usage:'Collations + overnight oats'},
-    {name:'Graines de courge',qty:'100g',price:'2€',usage:'Collations + snack soir'},
-    {name:'Noix',qty:'100g',price:'2€',usage:'Collation mercredi'},
-    {name:'Cacahuètes nature',qty:'100g',price:'1€',usage:'Collation samedi'},
-    {name:'Chocolat noir 70%',qty:'1 tablette',price:'2€',usage:'Collation samedi'},
-    {name:'Miel',qty:'1 pot (si vide)',price:'3€',usage:'Collation mardi'},
+    {name:'Graines de courge',qty:'150g',price:'3€',usage:'Snack soir'},
     {name:'Huile d\'olive',qty:'(stock)',price:'—',usage:'Cuisson'},
-    {name:'Sauce soja',qty:'1 bouteille',price:'2€',usage:'Dîner jeudi'},
+    {name:'Sauce soja',qty:'(stock)',price:'—',usage:'Wok'},
+    {name:'Moutarde',qty:'(stock)',price:'—',usage:'Viande'},
   ]},
-  {section:'Marie Blachère (midi Lun-Ven)',items:[
-    {name:'Club Maïstik (poulet)',qty:'5-8 /sem',price:'~20-30€',usage:'Base de chaque midi — le plus protéiné'},
-    {name:'Wrap poulet crispy',qty:'3-5 /sem',price:'~10-15€',usage:'Complément chaque midi'},
-    {name:'Wrap thon',qty:'1-2 /sem',price:'~4€',usage:'Variante du wrap poulet'},
-    {name:'Sandwich crudités (poulet/thon)',qty:'2-3 /sem',price:'~8-10€',usage:'3ème produit du combo'},
+  {section:'Marie Blachère (Lun-Ven)',items:[
+    {name:'Club Maïstik',qty:'5-8 /sem',price:'~25€',usage:'Base du midi'},
+    {name:'Wrap poulet crispy',qty:'3-5 /sem',price:'~12€',usage:'Combo midi'},
+    {name:'Wrap thon',qty:'1-2 /sem',price:'~4€',usage:'Variante'},
+    {name:'Sandwich crudités',qty:'2-3 /sem',price:'~9€',usage:'Combo midi'},
   ]},
 ];
 
@@ -583,18 +538,16 @@ const SWAPS = [
   {cat:'Protéines viande',from:'Filet mignon',to:'Rôti de porc, Escalope veau'},
   {cat:'Protéines poisson',from:'Cabillaud',to:'Lieu noir, Colin, Merlu, Daurade, Lotte'},
   {cat:'Protéines poisson',from:'Saumon',to:'Truite, Maquereau, Espadon'},
-  {cat:'Protéines poisson',from:'Thon conserve',to:'Sardines, Maquereau conserve'},
+  {cat:'Protéines poisson',from:'Thon frais',to:'Espadon, Saumon'},
   {cat:'Protéines poisson',from:'Crevettes',to:'Calamar, Langoustine'},
-  {cat:'Charcuterie',from:'Grisons',to:'Bresaola, Jambon blanc, Jambon cru'},
+  {cat:'Charcuterie',from:'Jambon blanc',to:'Bresaola, Grisons'},
   {cat:'Féculents',from:'Lentilles',to:'Pois chiches, Haricots rouges, Fèves'},
   {cat:'Féculents',from:'Quinoa',to:'Boulgour, Riz complet, Semoule'},
   {cat:'Féculents',from:'Patate douce',to:'Pomme de terre, Riz basmati'},
   {cat:'Légumes',from:'Brocoli',to:'Chou-fleur, Kale, Asperges'},
   {cat:'Légumes',from:'Épinards',to:'Blettes, Haricots verts'},
   {cat:'Légumes',from:'Courgette',to:'Aubergine, Poivrons, Champignons'},
-  {cat:'Fromages',from:'Comté',to:'Emmental, Beaufort, Cantal'},
-  {cat:'Fromages',from:'Feta',to:'Mozzarella, Chèvre frais'},
-  {cat:'Collation',from:'Amandes',to:'Noix de cajou, Cacahuètes, Graines courge'},
+  {cat:'Légumes',from:'Haricots verts',to:'Brocoli, Asperges, Petit pois'},
   {cat:'Petit-déj',from:'Oeufs brouillés',to:'Omelette, Oeufs pochés, Oeufs cocotte'},
   {cat:'Petit-déj',from:'Overnight oats',to:'Porridge chaud, Smoothie protéiné'},
 ];
@@ -603,16 +556,16 @@ const SWAPS = [
 // STATE
 // ═══════════════════════════════════════════════════════════════
 const TODAY = new Date().toISOString().slice(0,10);
+const CURRENT_WEEK = getCurrentWeekIndex();
 let selectedDayIndex = new Date().getDay(); // 0=dim
-// Convert to our index (0=lun)
 selectedDayIndex = selectedDayIndex === 0 ? 6 : selectedDayIndex - 1;
 
 let state = loadState();
 function loadState(){
-  try{const s=JSON.parse(localStorage.getItem('nt2'));if(s&&s.date===TODAY)return s}catch(e){}
+  try{const s=JSON.parse(localStorage.getItem('nt3'));if(s&&s.date===TODAY)return s}catch(e){}
   return{date:TODAY,dayTypes:{},checked:{},shopBought:{}};
 }
-function saveState(){localStorage.setItem('nt2',JSON.stringify(state))}
+function saveState(){localStorage.setItem('nt3',JSON.stringify(state))}
 
 function getDayType(idx){return state.dayTypes[idx]||'off'}
 function setDayType(type){
@@ -646,6 +599,7 @@ function updateDate(){
   const days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const months=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   document.getElementById('dateLabel').textContent=`${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('weekBadge').textContent=`Semaine ${CURRENT_WEEK+1}/4`;
 }
 
 function renderDaySelector(){
@@ -682,13 +636,14 @@ function selectDay(idx){
 }
 
 function getMealsForDay(dayIdx){
-  const plan=WEEK_PLAN[dayIdx];
+  const weekPlan=WEEK_PLANS[CURRENT_WEEK];
+  const plan=weekPlan[dayIdx];
   const type=getDayType(dayIdx);
   const meals=[];
-  const dayKey=dayIdx;
+  const dayKey=`${CURRENT_WEEK}-${dayIdx}`;
 
   // Petit-déj
-  const bk=BREAKFASTS[plan.bk];
+  const bk=ALL_BREAKFASTS[plan.bk];
   meals.push({id:`${dayKey}-bk`,name:bk.name,time:'7h00 - 8h00',prot:bk.prot,cal:bk.cal,
     foods:bk.foods.map(f=>({name:f.n,qty:f.q})),supps:bk.supps,timeRange:[6,9]});
 
@@ -699,20 +654,19 @@ function getMealsForDay(dayIdx){
   }
 
   // Déjeuner
-  const lu=LUNCHES[plan.lunch];
+  const lu=ALL_LUNCHES[plan.lunch];
   meals.push({id:`${dayKey}-lu`,name:lu.name,time:'12h30',prot:lu.prot,cal:lu.cal,
     foods:lu.foods.map(f=>({name:f.n,qty:f.q})),supps:null,timeRange:[11,14]});
 
-  // Post-training whey (only on training days, replaces old collation)
-  // Pas de collation 16h — Valentin ne mange rien à ce moment
+  // Pas de collation 16h
 
   // Dîner
-  const di=DINNERS[plan.dinner];
+  const di=ALL_DINNERS[plan.dinner];
   meals.push({id:`${dayKey}-di`,name:di.name,time:'19h30',prot:di.prot,cal:di.cal,
     foods:di.foods.map(f=>({name:f.n,qty:f.q})),supps:'Magnésium Taurine B6 — 2 gélules à 21h30',
     recipe:di.recipe,timeRange:[18,22]});
 
-  // Snack soir — tous les jours pour compléter les protéines (pas de collation 16h)
+  // Snack soir — tous les jours
   meals.push({id:`${dayKey}-ev`,name:'Snack soir protéiné',time:'21h00',prot:22,cal:200,
     foods:[{name:'Fromage blanc 0%',qty:'200g'},{name:'Whey nature (si jour off)',qty:type==='off'?'15g':'—'},{name:'Graines de courge',qty:'15g'}],
     supps:'Magnésium Taurine B6 — 2 gélules',timeRange:[20,22]});
@@ -789,6 +743,7 @@ function updateProgress(){
 // ═══════════════════════════════════════════════════════════════
 function renderShop(){
   let html='',totalPrice=0;
+  const SHOPPING=[...ALL_SHOPPING[CURRENT_WEEK],...COMMON_SHOPPING];
   SHOPPING.forEach(section=>{
     html+=`<div class="shop-section"><div class="shop-title">${section.section}</div>`;
     section.items.forEach((item,i)=>{
@@ -809,7 +764,8 @@ function renderShop(){
     html+='</div>';
   });
   document.getElementById('shopList').innerHTML=html;
-  document.getElementById('shopTotal').innerHTML=`Budget semaine : <span>~${Math.round(totalPrice)}€</span> / 122€ dispo`;
+  document.getElementById('shopWeek').textContent=CURRENT_WEEK+1;
+  document.getElementById('shopTotal').innerHTML=`Budget semaine : <span>~${Math.round(totalPrice)}€</span> (Grand Frais) + ~50€ Marie Blachère`;
 }
 
 function toggleShopItem(key){state.shopBought[key]=!state.shopBought[key];saveState();renderShop()}
@@ -850,7 +806,7 @@ function pinPress(n){
 function pinBack(){pinInput=pinInput.slice(0,-1);updateDots()}
 function updateDots(){document.querySelectorAll('.lock-dot').forEach((d,i)=>{d.classList.toggle('filled',i<pinInput.length);d.classList.remove('error')})}
 
-function resetAll(){if(confirm('Réinitialiser ?')){localStorage.removeItem('nt2');localStorage.removeItem('nt2_u');location.reload()}}
+function resetAll(){if(confirm('Réinitialiser ?')){localStorage.removeItem('nt3');localStorage.removeItem('nt2_u');location.reload()}}
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
