@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0f1a">
+<title>NutriTrack — Valentin</title>
+<link rel="manifest" href="manifest.json">
+<style>
+/* ─── RESET & BASE ────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0f1a;--bg2:#111827;--bg3:#1e293b;--bg4:#283548;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --blue:#3b82f6;--blue2:#2563eb;--blue-dim:#1e3a5f;
+  --green:#22c55e;--green-dim:#14532d;--green-bg:#052e16;
+  --orange:#f59e0b;--orange-dim:#78350f;
+  --red:#ef4444;--red-dim:#7f1d1d;
+  --violet:#a78bfa;--violet-dim:#4c1d95;
+  --radius:12px;--radius-sm:8px;
+}
+html,body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+body{padding-bottom:80px}
+
+/* ─── LOCK SCREEN ─────────────────────────────── */
+.lock-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:var(--bg);z-index:9999;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:20px;
+}
+.lock-overlay.hidden{display:none}
+.lock-title{font-size:24px;font-weight:700;color:var(--text)}
+.lock-subtitle{font-size:13px;color:var(--text2);margin-top:-10px}
+.lock-dots{display:flex;gap:12px;margin:10px 0}
+.lock-dot{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid var(--text3);transition:all .2s;
+}
+.lock-dot.filled{background:var(--blue);border-color:var(--blue)}
+.lock-dot.error{background:var(--red);border-color:var(--red)}
+.lock-keypad{
+  display:grid;grid-template-columns:repeat(3,72px);gap:12px;
+}
+.lock-key{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--bg2);border:1px solid var(--bg3);
+  color:var(--text);font-size:24px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;
+  -webkit-user-select:none;user-select:none;
+}
+.lock-key:active{background:var(--blue);border-color:var(--blue);transform:scale(.95)}
+.lock-key.empty{visibility:hidden}
+.lock-key.backspace{font-size:16px;color:var(--text2)}
+.lock-error-msg{
+  font-size:12px;color:var(--red);height:16px;
+}
+
+/* ─── NAV BOTTOM ──────────────────────────────── */
+.nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--bg2);border-top:1px solid var(--bg3);
+  display:flex;z-index:100;padding:6px 0;
+  padding-bottom:max(6px,env(safe-area-inset-bottom));
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:6px 0;background:none;border:none;
+  color:var(--text3);font-size:10px;cursor:pointer;
+  transition:color .2s;
+}
+.nav-btn.active{color:var(--blue)}
+.nav-btn svg{width:22px;height:22px}
+
+/* ─── PAGES ───────────────────────────────────── */
+.page{display:none;padding:16px;max-width:500px;margin:0 auto}
+.page.active{display:block}
+
+/* ─── HEADER ──────────────────────────────────── */
+.header{
+  text-align:center;padding:16px 0 8px;
+}
+.header h1{font-size:20px;font-weight:700;color:var(--text)}
+.header .subtitle{font-size:13px;color:var(--text2);margin-top:4px}
+.date-label{font-size:12px;color:var(--text3);margin-top:6px}
+
+/* ─── TOGGLE JOUR ─────────────────────────────── */
+.day-toggle{
+  display:flex;gap:8px;margin:16px 0;
+  background:var(--bg2);border-radius:var(--radius);padding:4px;
+}
+.day-toggle button{
+  flex:1;padding:10px;border:none;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:600;cursor:pointer;
+  background:transparent;color:var(--text3);transition:all .2s;
+}
+.day-toggle button.active{
+  background:var(--blue);color:#fff;
+}
+
+/* ─── PROGRESS RING ───────────────────────────── */
+.progress-section{
+  display:flex;align-items:center;gap:20px;
+  background:var(--bg2);border-radius:var(--radius);padding:20px;
+  margin-bottom:16px;
+}
+.ring-container{position:relative;width:90px;height:90px;flex-shrink:0}
+.ring-container svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--bg3);stroke-width:8}
+.ring-fill{
+  fill:none;stroke:var(--green);stroke-width:8;
+  stroke-linecap:round;transition:stroke-dashoffset .6s ease;
+}
+.ring-text{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;
+}
+.ring-value{font-size:22px;font-weight:700;color:var(--text)}
+.ring-label{font-size:10px;color:var(--text2)}
+.macros{flex:1}
+.macro-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--bg3);
+}
+.macro-row:last-child{border:none}
+.macro-name{font-size:12px;color:var(--text2)}
+.macro-bar{
+  flex:1;height:6px;background:var(--bg3);border-radius:3px;
+  margin:0 10px;overflow:hidden;
+}
+.macro-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.macro-val{font-size:12px;font-weight:600;color:var(--text);min-width:55px;text-align:right}
+
+/* ─── MEAL CARD ───────────────────────────────── */
+.meal-card{
+  background:var(--bg2);border-radius:var(--radius);
+  margin-bottom:10px;overflow:hidden;
+  border-left:3px solid var(--bg3);transition:all .3s;
+}
+.meal-card.current{border-left-color:var(--blue);background:var(--blue-dim)}
+.meal-card.done{border-left-color:var(--green);opacity:.7}
+.meal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;cursor:pointer;
+}
+.meal-left{display:flex;align-items:center;gap:12px}
+.meal-check{
+  width:24px;height:24px;border-radius:50%;
+  border:2px solid var(--text3);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.meal-card.done .meal-check{
+  border-color:var(--green);background:var(--green);
+}
+.meal-check svg{width:14px;height:14px;opacity:0;transition:opacity .2s}
+.meal-card.done .meal-check svg{opacity:1}
+.meal-info h3{font-size:14px;font-weight:600}
+.meal-info .meal-time{font-size:11px;color:var(--text2)}
+.meal-macros-badge{
+  font-size:12px;font-weight:700;color:var(--blue);
+  background:var(--blue-dim);padding:4px 10px;border-radius:20px;
+}
+.meal-card.done .meal-macros-badge{color:var(--green);background:var(--green-bg)}
+.meal-details{
+  display:none;padding:0 16px 14px;
+}
+.meal-card.expanded .meal-details{display:block}
+.meal-food{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;font-size:12px;color:var(--text2);
+  border-bottom:1px solid var(--bg3);
+}
+.meal-food:last-child{border:none}
+.meal-food .food-name{flex:1}
+.meal-food .food-qty{color:var(--text3);min-width:70px;text-align:right}
+.meal-supps{
+  margin-top:8px;padding:8px 10px;
+  background:var(--bg3);border-radius:var(--radius-sm);
+  font-size:11px;color:var(--orange);
+}
+
+/* ─── SHOPPING LIST ───────────────────────────── */
+.shop-section{margin-bottom:16px}
+.shop-title{
+  font-size:14px;font-weight:700;color:var(--blue);
+  padding:10px 0 6px;border-bottom:1px solid var(--bg3);
+  margin-bottom:6px;
+}
+.shop-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--bg3);
+}
+.shop-check{
+  width:20px;height:20px;border-radius:4px;
+  border:2px solid var(--text3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.shop-item.bought .shop-check{border-color:var(--green);background:var(--green)}
+.shop-check svg{width:12px;height:12px;opacity:0}
+.shop-item.bought .shop-check svg{opacity:1}
+.shop-item.bought .shop-name{text-decoration:line-through;color:var(--text3)}
+.shop-name{font-size:13px;flex:1}
+.shop-qty{font-size:12px;color:var(--text2);min-width:50px;text-align:right}
+.shop-price{font-size:12px;color:var(--orange);min-width:40px;text-align:right;font-weight:600}
+
+/* ─── SWAP ────────────────────────────────────── */
+.swap-section{margin-bottom:16px}
+.swap-title{
+  font-size:13px;font-weight:600;color:var(--violet);
+  padding:8px 0;
+}
+.swap-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;background:var(--bg2);
+  border-radius:var(--radius-sm);margin-bottom:6px;
+  font-size:12px;
+}
+.swap-arrow{color:var(--violet);font-weight:700;flex-shrink:0}
+.swap-from{color:var(--text);font-weight:600;min-width:80px}
+.swap-to{color:var(--text2);flex:1}
+
+/* ─── SETTINGS ────────────────────────────────── */
+.setting-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px;background:var(--bg2);border-radius:var(--radius-sm);
+  margin-bottom:8px;
+}
+.setting-label{font-size:13px}
+.setting-value{font-size:13px;color:var(--blue);font-weight:600}
+
+/* ─── UTILS ───────────────────────────────────── */
+.section-title{
+  font-size:16px;font-weight:700;color:var(--text);
+  padding:16px 0 10px;
+}
+.badge{
+  display:inline-block;padding:3px 8px;border-radius:10px;
+  font-size:10px;font-weight:600;
+}
+.badge-blue{background:var(--blue-dim);color:var(--blue)}
+.badge-green{background:var(--green-bg);color:var(--green)}
+.badge-orange{background:var(--orange-dim);color:var(--orange)}
+
+.reset-btn{
+  display:block;width:100%;padding:14px;margin-top:16px;
+  background:var(--red-dim);color:var(--red);border:none;
+  border-radius:var(--radius-sm);font-size:14px;font-weight:600;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOCK SCREEN ═══════════ -->
+<div class="lock-overlay" id="lockScreen">
+  <div class="lock-title">NutriTrack</div>
+  <div class="lock-subtitle">Entre ton code PIN</div>
+  <div class="lock-dots" id="lockDots">
+    <div class="lock-dot"></div>
+    <div class="lock-dot"></div>
+    <div class="lock-dot"></div>
+    <div class="lock-dot"></div>
+  </div>
+  <div class="lock-error-msg" id="lockError"></div>
+  <div class="lock-keypad">
+    <div class="lock-key" onclick="pinPress('1')">1</div>
+    <div class="lock-key" onclick="pinPress('2')">2</div>
+    <div class="lock-key" onclick="pinPress('3')">3</div>
+    <div class="lock-key" onclick="pinPress('4')">4</div>
+    <div class="lock-key" onclick="pinPress('5')">5</div>
+    <div class="lock-key" onclick="pinPress('6')">6</div>
+    <div class="lock-key" onclick="pinPress('7')">7</div>
+    <div class="lock-key" onclick="pinPress('8')">8</div>
+    <div class="lock-key" onclick="pinPress('9')">9</div>
+    <div class="lock-key empty"></div>
+    <div class="lock-key" onclick="pinPress('0')">0</div>
+    <div class="lock-key backspace" onclick="pinBack()">&#9003;</div>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE AUJOURD'HUI ═══════════ -->
+<div id="page-today" class="page active">
+  <div class="header">
+    <h1>NutriTrack</h1>
+    <div class="subtitle">Objectif : physique athlétique</div>
+    <div class="date-label" id="dateLabel"></div>
+  </div>
+
+  <div class="day-toggle">
+    <button id="btnOn" onclick="setDayType('on')">Jour de séance</button>
+    <button id="btnOff" onclick="setDayType('off')">Jour de repos</button>
+  </div>
+
+  <div class="progress-section">
+    <div class="ring-container">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-bg" cx="45" cy="45" r="38"/>
+        <circle class="ring-fill" id="protRing" cx="45" cy="45" r="38"
+          stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
+      </svg>
+      <div class="ring-text">
+        <div class="ring-value" id="protValue">0</div>
+        <div class="ring-label">protéines</div>
+      </div>
+    </div>
+    <div class="macros">
+      <div class="macro-row">
+        <span class="macro-name">Protéines</span>
+        <div class="macro-bar"><div class="macro-bar-fill" id="barProt" style="width:0%;background:var(--green)"></div></div>
+        <span class="macro-val" id="valProt">0 / 180g</span>
+      </div>
+      <div class="macro-row">
+        <span class="macro-name">Calories</span>
+        <div class="macro-bar"><div class="macro-bar-fill" id="barCal" style="width:0%;background:var(--blue)"></div></div>
+        <span class="macro-val" id="valCal">0 / 2300</span>
+      </div>
+      <div class="macro-row">
+        <span class="macro-name">Repas</span>
+        <div class="macro-bar"><div class="macro-bar-fill" id="barMeals" style="width:0%;background:var(--orange)"></div></div>
+        <span class="macro-val" id="valMeals">0 / 5</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="mealsList"></div>
+</div>
+
+<!-- ═══════════ PAGE COURSES ═══════════ -->
+<div id="page-shop" class="page">
+  <div class="header">
+    <h1>Liste de courses</h1>
+    <div class="subtitle">Grand Frais — Semaine type</div>
+  </div>
+  <div id="shopList"></div>
+  <button class="reset-btn" onclick="resetShop()">Réinitialiser la liste</button>
+</div>
+
+<!-- ═══════════ PAGE SWAPS ═══════════ -->
+<div id="page-swap" class="page">
+  <div class="header">
+    <h1>Alternatives</h1>
+    <div class="subtitle">Échange un aliment quand tu en as marre</div>
+  </div>
+  <div id="swapList"></div>
+</div>
+
+<!-- ═══════════ PAGE PROFIL ═══════════ -->
+<div id="page-profile" class="page">
+  <div class="header">
+    <h1>Mon profil</h1>
+    <div class="subtitle">Tes objectifs et paramètres</div>
+  </div>
+  <div class="section-title">Objectifs</div>
+  <div class="setting-row"><span class="setting-label">Protéines / jour</span><span class="setting-value">180g</span></div>
+  <div class="setting-row"><span class="setting-label">Calories / jour</span><span class="setting-value">2 300 kcal</span></div>
+  <div class="setting-row"><span class="setting-label">Poids actuel</span><span class="setting-value">98-100 kg</span></div>
+  <div class="setting-row"><span class="setting-label">Objectif</span><span class="setting-value">Recomposition</span></div>
+  <div class="setting-row"><span class="setting-label">Budget courses</span><span class="setting-value">490 EUR/mois</span></div>
+
+  <div class="section-title">Compléments</div>
+  <div class="setting-row"><span class="setting-label">Créatine Creapure</span><span class="setting-value">5g / jour</span></div>
+  <div class="setting-row"><span class="setting-label">D3 + K2 MK-7</span><span class="setting-value">3 gouttes matin</span></div>
+  <div class="setting-row"><span class="setting-label">Whey Isolate Native</span><span class="setting-value">25g / dose</span></div>
+  <div class="setting-row"><span class="setting-label">Magnésium Taurine B6</span><span class="setting-value">2 gél. soir</span></div>
+
+  <div class="section-title">Sport</div>
+  <div class="setting-row"><span class="setting-label">Activité</span><span class="setting-value">Street workout</span></div>
+  <div class="setting-row"><span class="setting-label">Fréquence</span><span class="setting-value">2-4x / semaine</span></div>
+
+  <button class="reset-btn" onclick="resetAll()">Réinitialiser toutes les données</button>
+</div>
+
+<!-- ═══════════ NAVIGATION ═══════════ -->
+<nav class="nav">
+  <button class="nav-btn active" data-page="page-today" onclick="showPage('page-today',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    <span>Aujourd'hui</span>
+  </button>
+  <button class="nav-btn" data-page="page-shop" onclick="showPage('page-shop',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    <span>Courses</span>
+  </button>
+  <button class="nav-btn" data-page="page-swap" onclick="showPage('page-swap',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+    <span>Swaps</span>
+  </button>
+  <button class="nav-btn" data-page="page-profile" onclick="showPage('page-profile',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Profil</span>
+  </button>
+</nav>
+
+<script>
+// ─── DATA ────────────────────────────────────────
+const MEALS = {
+  on: [
+    {
+      id:'m1', name:'Petit-déjeuner', time:'7h00 - 7h30', prot:42, cal:480,
+      foods:[
+        {name:'Oeufs brouillés', qty:'3 oeufs'},
+        {name:'Pain complet', qty:'1 tranche'},
+        {name:'Fromage blanc 0%', qty:'150g'},
+        {name:'Banane', qty:'1'},
+      ],
+      supps:'Créatine 5g + D3K2 3 gouttes (sur les oeufs)',
+      timeRange:[6,8]
+    },
+    {
+      id:'m2', name:'Post-training', time:'9h00', prot:24, cal:100,
+      foods:[
+        {name:'Whey Isolate Native', qty:'25g (1 dose)'},
+        {name:'Eau', qty:'250ml'},
+      ],
+      supps:null,
+      timeRange:[8,10]
+    },
+    {
+      id:'m3', name:'Déjeuner', time:'12h30', prot:45, cal:520,
+      foods:[
+        {name:'Wrap / tortilla', qty:'1'},
+        {name:'Thon en conserve', qty:'120g'},
+        {name:'Emmental râpé', qty:'30g'},
+        {name:'Salade, tomate, concombre', qty:'garniture'},
+        {name:'Moutarde', qty:'1 cuillère'},
+        {name:'Pomme', qty:'1'},
+      ],
+      supps:null,
+      timeRange:[11,14]
+    },
+    {
+      id:'m4', name:'Collation', time:'16h00', prot:18, cal:260,
+      foods:[
+        {name:'Viande des Grisons', qty:'30g'},
+        {name:'Amandes nature', qty:'30g'},
+        {name:'Kiwi', qty:'1'},
+      ],
+      supps:null,
+      timeRange:[15,17]
+    },
+    {
+      id:'m5', name:'Dîner', time:'19h30', prot:62, cal:650,
+      foods:[
+        {name:'Filet de poulet grillé', qty:'200g'},
+        {name:'Lentilles vertes', qty:'80g (sec)'},
+        {name:'Brocoli vapeur', qty:'150g'},
+        {name:'Huile d\'olive', qty:'1 cs'},
+      ],
+      supps:'Magnésium Taurine B6 — 2 gélules à 21h30',
+      timeRange:[18,22]
+    },
+  ],
+  off: [
+    {
+      id:'r1', name:'Petit-déjeuner', time:'7h30 - 8h00', prot:25, cal:450,
+      foods:[
+        {name:'Oeufs au plat', qty:'3 oeufs'},
+        {name:'Avocat', qty:'1/2'},
+        {name:'Pain complet', qty:'1 tranche'},
+      ],
+      supps:'Créatine 5g + D3K2 3 gouttes',
+      timeRange:[6,9]
+    },
+    {
+      id:'r2', name:'Déjeuner', time:'12h30', prot:48, cal:550,
+      foods:[
+        {name:'Pain complet', qty:'sandwich'},
+        {name:'Poulet froid (rôti veille)', qty:'100g'},
+        {name:'Comté', qty:'30g'},
+        {name:'Salade, tomate', qty:'garniture'},
+        {name:'Moutarde', qty:'1 cuillère'},
+        {name:'Fromage blanc 0%', qty:'150g'},
+      ],
+      supps:null,
+      timeRange:[11,14]
+    },
+    {
+      id:'r3', name:'Collation', time:'16h00', prot:26, cal:190,
+      foods:[
+        {name:'Whey Isolate Native', qty:'25g (1 dose)'},
+        {name:'Banane', qty:'1'},
+      ],
+      supps:null,
+      timeRange:[15,17]
+    },
+    {
+      id:'r4', name:'Dîner', time:'19h30', prot:50, cal:530,
+      foods:[
+        {name:'Cabillaud au four', qty:'200g'},
+        {name:'Quinoa', qty:'80g (sec)'},
+        {name:'Épinards sautés à l\'ail', qty:'200g'},
+        {name:'Citron', qty:'1/2'},
+      ],
+      supps:'Magnésium Taurine B6 — 2 gélules à 21h30',
+      timeRange:[18,22]
+    },
+    {
+      id:'r5', name:'Snack soir', time:'21h00', prot:17, cal:180,
+      foods:[
+        {name:'Fromage blanc 0%', qty:'150g'},
+        {name:'Graines de courge', qty:'20g'},
+      ],
+      supps:null,
+      timeRange:[20,22]
+    },
+  ]
+};
+
+const SHOPPING = [
+  {
+    section:'Boucherie', items:[
+      {name:'Filets de poulet', qty:'600g', price:'~7€'},
+      {name:'Escalopes de dinde', qty:'400g', price:'~6€'},
+      {name:'Steak haché 5%', qty:'400g', price:'~5€'},
+      {name:'Filet mignon de porc', qty:'400g', price:'~6€'},
+      {name:'Jambon blanc supérieur', qty:'6 tranches', price:'~3€'},
+    ]
+  },
+  {
+    section:'Poissonnerie', items:[
+      {name:'Cabillaud (filets)', qty:'400g', price:'~8€'},
+      {name:'Saumon (pavé)', qty:'360g', price:'~8€'},
+      {name:'Truite (filets)', qty:'400g', price:'~7€'},
+    ]
+  },
+  {
+    section:'Crèmerie / Fromagerie', items:[
+      {name:'Oeufs', qty:'18 (plaque)', price:'~5€'},
+      {name:'Fromage blanc 0%', qty:'1 kg', price:'~3€'},
+      {name:'Emmental râpé', qty:'200g', price:'~2€'},
+      {name:'Comté', qty:'150g', price:'~4€'},
+    ]
+  },
+  {
+    section:'Fruits & Légumes', items:[
+      {name:'Brocoli', qty:'500g', price:'~2€'},
+      {name:'Épinards frais', qty:'400g', price:'~3€'},
+      {name:'Haricots verts', qty:'400g', price:'~3€'},
+      {name:'Courgettes', qty:'400g', price:'~2€'},
+      {name:'Poivrons', qty:'3 pièces', price:'~3€'},
+      {name:'Salade', qty:'2 pièces', price:'~2€'},
+      {name:'Tomates', qty:'1 kg', price:'~3€'},
+      {name:'Concombre', qty:'1 pièce', price:'~1€'},
+      {name:'Patate douce', qty:'500g', price:'~2€'},
+      {name:'Avocat', qty:'3 pièces', price:'~3€'},
+      {name:'Bananes', qty:'1 kg', price:'~2€'},
+      {name:'Pommes', qty:'1 kg', price:'~3€'},
+      {name:'Kiwis', qty:'6 pièces', price:'~3€'},
+      {name:'Citrons', qty:'3 pièces', price:'~1€'},
+      {name:'Ail + oignons', qty:'1 tête + 3', price:'~2€'},
+      {name:'Herbes fraîches', qty:'1-2 bouquets', price:'~2€'},
+    ]
+  },
+  {
+    section:'Épicerie (mensuel)', items:[
+      {name:'Thon en conserve naturel', qty:'6 boîtes', price:'~8€'},
+      {name:'Lentilles vertes', qty:'500g', price:'~2€'},
+      {name:'Quinoa', qty:'500g', price:'~4€'},
+      {name:'Riz complet', qty:'1 kg', price:'~3€'},
+      {name:'Boulgour', qty:'500g', price:'~2€'},
+      {name:'Pois chiches', qty:'500g', price:'~2€'},
+      {name:'Haricots rouges', qty:'500g', price:'~2€'},
+      {name:'Flocons d\'avoine', qty:'500g', price:'~2€'},
+      {name:'Amandes nature', qty:'200g', price:'~4€'},
+      {name:'Graines de courge', qty:'200g', price:'~4€'},
+      {name:'Viande des Grisons', qty:'2 paquets', price:'~6€'},
+      {name:'Pain complet', qty:'1 paquet', price:'~3€'},
+      {name:'Wraps / tortillas', qty:'1 paquet', price:'~3€'},
+      {name:'Huile d\'olive', qty:'500ml', price:'~5€'},
+      {name:'Moutarde', qty:'1 pot', price:'~2€'},
+    ]
+  }
+];
+
+const SWAPS = [
+  {cat:'Protéines viande', from:'Poulet', to:'Dinde, Lapin, Veau, Pintade, Filet mignon'},
+  {cat:'Protéines viande', from:'Steak haché', to:'Rumsteck, Onglet, Hampe, Bavette'},
+  {cat:'Protéines poisson', from:'Cabillaud', to:'Lieu noir, Colin, Merlu, Daurade, Lotte'},
+  {cat:'Protéines poisson', from:'Saumon', to:'Truite, Maquereau'},
+  {cat:'Protéines poisson', from:'Thon conserve', to:'Sardines, Maquereau conserve'},
+  {cat:'Protéines charcuterie', from:'Grisons', to:'Bresaola, Jambon blanc'},
+  {cat:'Féculents', from:'Lentilles', to:'Pois chiches, Haricots rouges, Fèves'},
+  {cat:'Féculents', from:'Quinoa', to:'Boulgour, Riz complet, Semoule'},
+  {cat:'Féculents', from:'Patate douce', to:'Pomme de terre, Riz'},
+  {cat:'Légumes', from:'Brocoli', to:'Chou-fleur, Kale, Asperges'},
+  {cat:'Légumes', from:'Épinards', to:'Blettes, Haricots verts'},
+  {cat:'Légumes', from:'Courgette', to:'Aubergine, Poivrons, Champignons'},
+  {cat:'Collation', from:'Amandes', to:'Noix de cajou, Cacahuètes, Graines courge'},
+  {cat:'Petit-déj', from:'Oeufs brouillés', to:'Omelette, Oeufs au plat, Overnight oats'},
+];
+
+// ─── STATE ───────────────────────────────────────
+const TODAY = new Date().toISOString().slice(0,10);
+let state = loadState();
+
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem('nutritrack'));
+    if(s && s.date === TODAY) return s;
+  } catch(e){}
+  return {date:TODAY, dayType:'on', checked:{}, shopBought:{}};
+}
+function saveState(){localStorage.setItem('nutritrack',JSON.stringify(state))}
+
+// ─── NAVIGATION ──────────────────────────────────
+function showPage(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─── DATE ────────────────────────────────────────
+function updateDate(){
+  const d = new Date();
+  const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  document.getElementById('dateLabel').textContent =
+    `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ─── DAY TYPE ────────────────────────────────────
+function setDayType(type){
+  state.dayType = type;
+  state.checked = {};
+  saveState();
+  render();
+}
+
+// ─── RENDER MEALS ────────────────────────────────
+function render(){
+  updateDate();
+  const type = state.dayType;
+  document.getElementById('btnOn').classList.toggle('active', type==='on');
+  document.getElementById('btnOff').classList.toggle('active', type==='off');
+
+  const meals = MEALS[type];
+  const hour = new Date().getHours();
+  let html = '';
+
+  meals.forEach(m => {
+    const done = state.checked[m.id] || false;
+    const isCurrent = !done && hour >= m.timeRange[0] && hour < m.timeRange[1];
+    const classes = [
+      'meal-card',
+      done ? 'done' : '',
+      isCurrent ? 'current' : ''
+    ].filter(Boolean).join(' ');
+
+    let foodsHtml = m.foods.map(f =>
+      `<div class="meal-food"><span class="food-name">${f.name}</span><span class="food-qty">${f.qty}</span></div>`
+    ).join('');
+
+    let suppsHtml = m.supps ? `<div class="meal-supps">${m.supps}</div>` : '';
+
+    html += `
+      <div class="${classes}" id="card-${m.id}">
+        <div class="meal-header" onclick="toggleExpand('${m.id}')">
+          <div class="meal-left">
+            <div class="meal-check" onclick="event.stopPropagation();toggleMeal('${m.id}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="meal-info">
+              <h3>${m.name}</h3>
+              <div class="meal-time">${m.time}</div>
+            </div>
+          </div>
+          <div class="meal-macros-badge">${m.prot}g prot</div>
+        </div>
+        <div class="meal-details">
+          ${foodsHtml}
+          ${suppsHtml}
+        </div>
+      </div>`;
+  });
+
+  document.getElementById('mealsList').innerHTML = html;
+  updateProgress();
+}
+
+function toggleMeal(id){
+  state.checked[id] = !state.checked[id];
+  saveState();
+  render();
+}
+
+function toggleExpand(id){
+  const card = document.getElementById('card-'+id);
+  card.classList.toggle('expanded');
+}
+
+// ─── PROGRESS ────────────────────────────────────
+function updateProgress(){
+  const meals = MEALS[state.dayType];
+  let totalProt = 0, totalCal = 0, totalMeals = 0;
+  const targetProt = 180, targetCal = 2300;
+
+  meals.forEach(m => {
+    if(state.checked[m.id]){
+      totalProt += m.prot;
+      totalCal += m.cal;
+      totalMeals++;
+    }
+  });
+
+  // Ring
+  const pct = Math.min(totalProt / targetProt, 1);
+  const circumference = 2 * Math.PI * 38;
+  const offset = circumference * (1 - pct);
+  document.getElementById('protRing').style.strokeDashoffset = offset;
+  document.getElementById('protValue').textContent = totalProt + 'g';
+
+  // Color ring based on progress
+  const ring = document.getElementById('protRing');
+  if(pct >= 1) ring.style.stroke = 'var(--green)';
+  else if(pct >= 0.5) ring.style.stroke = 'var(--blue)';
+  else ring.style.stroke = 'var(--orange)';
+
+  // Bars
+  const protPct = Math.min(totalProt/targetProt*100, 100);
+  const calPct = Math.min(totalCal/targetCal*100, 100);
+  const mealPct = totalMeals/meals.length*100;
+
+  document.getElementById('barProt').style.width = protPct+'%';
+  document.getElementById('valProt').textContent = `${totalProt} / ${targetProt}g`;
+  document.getElementById('barCal').style.width = calPct+'%';
+  document.getElementById('valCal').textContent = `${totalCal} / ${targetCal}`;
+  document.getElementById('barMeals').style.width = mealPct+'%';
+  document.getElementById('valMeals').textContent = `${totalMeals} / ${meals.length}`;
+}
+
+// ─── SHOPPING ────────────────────────────────────
+function renderShop(){
+  let html = '';
+  SHOPPING.forEach(section => {
+    html += `<div class="shop-section"><div class="shop-title">${section.section}</div>`;
+    section.items.forEach((item, i) => {
+      const key = section.section + '-' + i;
+      const bought = state.shopBought[key] || false;
+      html += `
+        <div class="shop-item ${bought?'bought':''}" onclick="toggleShopItem('${key}')">
+          <div class="shop-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="shop-name">${item.name}</span>
+          <span class="shop-qty">${item.qty}</span>
+          <span class="shop-price">${item.price}</span>
+        </div>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('shopList').innerHTML = html;
+}
+
+function toggleShopItem(key){
+  state.shopBought[key] = !state.shopBought[key];
+  saveState();
+  renderShop();
+}
+
+function resetShop(){
+  state.shopBought = {};
+  saveState();
+  renderShop();
+}
+
+// ─── SWAPS ───────────────────────────────────────
+function renderSwaps(){
+  let html = '';
+  let currentCat = '';
+  SWAPS.forEach(s => {
+    if(s.cat !== currentCat){
+      currentCat = s.cat;
+      html += `<div class="swap-title">${s.cat}</div>`;
+    }
+    html += `
+      <div class="swap-row">
+        <span class="swap-from">${s.from}</span>
+        <span class="swap-arrow">→</span>
+        <span class="swap-to">${s.to}</span>
+      </div>`;
+  });
+  document.getElementById('swapList').innerHTML = html;
+}
+
+// ─── RESET ───────────────────────────────────────
+function resetAll(){
+  if(confirm('Réinitialiser toutes les données ?')){
+    localStorage.removeItem('nutritrack');
+    state = {date:TODAY, dayType:'on', checked:{}, shopBought:{}};
+    render();
+    renderShop();
+  }
+}
+
+// ─── LOCK SCREEN ─────────────────────────────────
+const PIN_CODE = '2580';
+let pinInput = '';
+
+function checkUnlocked(){
+  const ts = localStorage.getItem('nutritrack_unlock');
+  if(!ts) return false;
+  return (Date.now() - parseInt(ts)) < 12*60*60*1000;
+}
+
+function unlock(){
+  localStorage.setItem('nutritrack_unlock', Date.now().toString());
+  document.getElementById('lockScreen').classList.add('hidden');
+}
+
+function pinPress(n){
+  if(pinInput.length >= 4) return;
+  pinInput += n;
+  updateDots();
+  if(pinInput.length === 4){
+    if(pinInput === PIN_CODE){
+      setTimeout(()=>{ unlock(); pinInput=''; updateDots(); }, 200);
+    } else {
+      document.querySelectorAll('.lock-dot').forEach(d=>d.classList.add('error'));
+      document.getElementById('lockError').textContent = 'Code incorrect';
+      setTimeout(()=>{
+        pinInput='';
+        updateDots();
+        document.querySelectorAll('.lock-dot').forEach(d=>d.classList.remove('error'));
+        document.getElementById('lockError').textContent = '';
+      }, 800);
+    }
+  }
+}
+
+function pinBack(){
+  pinInput = pinInput.slice(0,-1);
+  updateDots();
+}
+
+function updateDots(){
+  const dots = document.querySelectorAll('.lock-dot');
+  dots.forEach((d,i)=>{
+    d.classList.toggle('filled', i < pinInput.length);
+    d.classList.remove('error');
+  });
+}
+
+// ─── INIT ────────────────────────────────────────
+if(checkUnlocked()){
+  document.getElementById('lockScreen').classList.add('hidden');
+}
+render();
+renderShop();
+renderSwaps();
+</script>
+</body>
+</html>
