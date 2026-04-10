@@ -9,7 +9,6 @@
 <title>NutriTrack — Valentin</title>
 <link rel="manifest" href="manifest.json">
 <style>
-/* ─── RESET & BASE ────────────────────────────── */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#0a0f1a;--bg2:#111827;--bg3:#1e293b;--bg4:#283548;
@@ -19,7 +18,7 @@
   --orange:#f59e0b;--orange-dim:#78350f;
   --red:#ef4444;--red-dim:#7f1d1d;
   --violet:#a78bfa;--violet-dim:#4c1d95;
-  --radius:12px;--radius-sm:8px;
+  --radius:14px;--radius-sm:10px;
 }
 html,body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
@@ -29,7 +28,7 @@ html,body{
 }
 body{padding-bottom:80px}
 
-/* ─── LOCK SCREEN ─────────────────────────────── */
+/* ─── LOCK ────────────────────────────────────── */
 .lock-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;
   background:var(--bg);z-index:9999;
@@ -37,34 +36,26 @@ body{padding-bottom:80px}
   justify-content:center;gap:20px;
 }
 .lock-overlay.hidden{display:none}
-.lock-title{font-size:24px;font-weight:700;color:var(--text)}
+.lock-title{font-size:24px;font-weight:700}
 .lock-subtitle{font-size:13px;color:var(--text2);margin-top:-10px}
 .lock-dots{display:flex;gap:12px;margin:10px 0}
-.lock-dot{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid var(--text3);transition:all .2s;
-}
+.lock-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--text3);transition:all .2s}
 .lock-dot.filled{background:var(--blue);border-color:var(--blue)}
 .lock-dot.error{background:var(--red);border-color:var(--red)}
-.lock-keypad{
-  display:grid;grid-template-columns:repeat(3,72px);gap:12px;
-}
+.lock-keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}
 .lock-key{
   width:72px;height:72px;border-radius:50%;
   background:var(--bg2);border:1px solid var(--bg3);
   color:var(--text);font-size:24px;font-weight:600;
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all .15s;
-  -webkit-user-select:none;user-select:none;
+  cursor:pointer;transition:all .15s;-webkit-user-select:none;user-select:none;
 }
 .lock-key:active{background:var(--blue);border-color:var(--blue);transform:scale(.95)}
 .lock-key.empty{visibility:hidden}
 .lock-key.backspace{font-size:16px;color:var(--text2)}
-.lock-error-msg{
-  font-size:12px;color:var(--red);height:16px;
-}
+.lock-error-msg{font-size:12px;color:var(--red);height:16px}
 
-/* ─── NAV BOTTOM ──────────────────────────────── */
+/* ─── NAV ─────────────────────────────────────── */
 .nav{
   position:fixed;bottom:0;left:0;right:0;
   background:var(--bg2);border-top:1px solid var(--bg3);
@@ -74,8 +65,7 @@ body{padding-bottom:80px}
 .nav-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;
   gap:3px;padding:6px 0;background:none;border:none;
-  color:var(--text3);font-size:10px;cursor:pointer;
-  transition:color .2s;
+  color:var(--text3);font-size:10px;cursor:pointer;transition:color .2s;
 }
 .nav-btn.active{color:var(--blue)}
 .nav-btn svg{width:22px;height:22px}
@@ -85,16 +75,31 @@ body{padding-bottom:80px}
 .page.active{display:block}
 
 /* ─── HEADER ──────────────────────────────────── */
-.header{
-  text-align:center;padding:16px 0 8px;
-}
-.header h1{font-size:20px;font-weight:700;color:var(--text)}
+.header{text-align:center;padding:16px 0 8px}
+.header h1{font-size:20px;font-weight:700}
 .header .subtitle{font-size:13px;color:var(--text2);margin-top:4px}
 .date-label{font-size:12px;color:var(--text3);margin-top:6px}
 
-/* ─── TOGGLE JOUR ─────────────────────────────── */
+/* ─── DAY SELECTOR ────────────────────────────── */
+.day-selector{
+  display:flex;gap:6px;margin:12px 0;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;padding:2px 0;
+}
+.day-btn{
+  flex-shrink:0;padding:8px 0;width:44px;
+  border:none;border-radius:var(--radius-sm);
+  background:var(--bg2);color:var(--text3);font-size:11px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;transition:all .2s;
+}
+.day-btn.active{background:var(--blue);color:#fff}
+.day-btn.today{border:2px solid var(--blue)}
+.day-btn .day-name{font-weight:600;font-size:10px}
+.day-btn .day-num{font-size:14px;font-weight:700}
+
+/* ─── TOGGLE ──────────────────────────────────── */
 .day-toggle{
-  display:flex;gap:8px;margin:16px 0;
+  display:flex;gap:8px;margin:10px 0;
   background:var(--bg2);border-radius:var(--radius);padding:4px;
 }
 .day-toggle button{
@@ -102,173 +107,122 @@ body{padding-bottom:80px}
   font-size:13px;font-weight:600;cursor:pointer;
   background:transparent;color:var(--text3);transition:all .2s;
 }
-.day-toggle button.active{
-  background:var(--blue);color:#fff;
-}
+.day-toggle button.active{background:var(--blue);color:#fff}
 
-/* ─── PROGRESS RING ───────────────────────────── */
+/* ─── PROGRESS ────────────────────────────────── */
 .progress-section{
   display:flex;align-items:center;gap:20px;
-  background:var(--bg2);border-radius:var(--radius);padding:20px;
-  margin-bottom:16px;
+  background:var(--bg2);border-radius:var(--radius);padding:16px;
+  margin-bottom:14px;
 }
-.ring-container{position:relative;width:90px;height:90px;flex-shrink:0}
+.ring-container{position:relative;width:85px;height:85px;flex-shrink:0}
 .ring-container svg{transform:rotate(-90deg)}
 .ring-bg{fill:none;stroke:var(--bg3);stroke-width:8}
-.ring-fill{
-  fill:none;stroke:var(--green);stroke-width:8;
-  stroke-linecap:round;transition:stroke-dashoffset .6s ease;
-}
-.ring-text{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  text-align:center;
-}
-.ring-value{font-size:22px;font-weight:700;color:var(--text)}
-.ring-label{font-size:10px;color:var(--text2)}
+.ring-fill{fill:none;stroke:var(--green);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.ring-value{font-size:20px;font-weight:700}
+.ring-label{font-size:9px;color:var(--text2)}
 .macros{flex:1}
-.macro-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:6px 0;border-bottom:1px solid var(--bg3);
-}
+.macro-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bg3)}
 .macro-row:last-child{border:none}
-.macro-name{font-size:12px;color:var(--text2)}
-.macro-bar{
-  flex:1;height:6px;background:var(--bg3);border-radius:3px;
-  margin:0 10px;overflow:hidden;
-}
+.macro-name{font-size:11px;color:var(--text2)}
+.macro-bar{flex:1;height:5px;background:var(--bg3);border-radius:3px;margin:0 8px;overflow:hidden}
 .macro-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
-.macro-val{font-size:12px;font-weight:600;color:var(--text);min-width:55px;text-align:right}
+.macro-val{font-size:11px;font-weight:600;min-width:55px;text-align:right}
 
 /* ─── MEAL CARD ───────────────────────────────── */
 .meal-card{
   background:var(--bg2);border-radius:var(--radius);
-  margin-bottom:10px;overflow:hidden;
+  margin-bottom:8px;overflow:hidden;
   border-left:3px solid var(--bg3);transition:all .3s;
 }
 .meal-card.current{border-left-color:var(--blue);background:var(--blue-dim)}
 .meal-card.done{border-left-color:var(--green);opacity:.7}
-.meal-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;cursor:pointer;
-}
-.meal-left{display:flex;align-items:center;gap:12px}
+.meal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer}
+.meal-left{display:flex;align-items:center;gap:10px}
 .meal-check{
-  width:24px;height:24px;border-radius:50%;
-  border:2px solid var(--text3);display:flex;align-items:center;
-  justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;
+  width:24px;height:24px;border-radius:50%;border:2px solid var(--text3);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .2s;flex-shrink:0;
 }
-.meal-card.done .meal-check{
-  border-color:var(--green);background:var(--green);
-}
+.meal-card.done .meal-check{border-color:var(--green);background:var(--green)}
 .meal-check svg{width:14px;height:14px;opacity:0;transition:opacity .2s}
 .meal-card.done .meal-check svg{opacity:1}
-.meal-info h3{font-size:14px;font-weight:600}
-.meal-info .meal-time{font-size:11px;color:var(--text2)}
-.meal-macros-badge{
-  font-size:12px;font-weight:700;color:var(--blue);
-  background:var(--blue-dim);padding:4px 10px;border-radius:20px;
-}
+.meal-info h3{font-size:13px;font-weight:600}
+.meal-info .meal-time{font-size:10px;color:var(--text2)}
+.meal-macros-badge{font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-dim);padding:4px 8px;border-radius:20px}
 .meal-card.done .meal-macros-badge{color:var(--green);background:var(--green-bg)}
-.meal-details{
-  display:none;padding:0 16px 14px;
-}
+.meal-details{display:none;padding:0 14px 12px}
 .meal-card.expanded .meal-details{display:block}
-.meal-food{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:6px 0;font-size:12px;color:var(--text2);
-  border-bottom:1px solid var(--bg3);
-}
+.meal-food{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;color:var(--text2);border-bottom:1px solid var(--bg3)}
 .meal-food:last-child{border:none}
-.meal-food .food-name{flex:1}
-.meal-food .food-qty{color:var(--text3);min-width:70px;text-align:right}
-.meal-supps{
-  margin-top:8px;padding:8px 10px;
-  background:var(--bg3);border-radius:var(--radius-sm);
-  font-size:11px;color:var(--orange);
-}
+.meal-food .food-qty{color:var(--text3);text-align:right}
+.meal-supps{margin-top:6px;padding:6px 10px;background:var(--bg3);border-radius:var(--radius-sm);font-size:10px;color:var(--orange)}
+.meal-recipe{margin-top:6px;padding:8px 10px;background:var(--bg3);border-radius:var(--radius-sm);font-size:10px;color:var(--text2)}
+.meal-recipe b{color:var(--text)}
 
-/* ─── SHOPPING LIST ───────────────────────────── */
-.shop-section{margin-bottom:16px}
-.shop-title{
-  font-size:14px;font-weight:700;color:var(--blue);
-  padding:10px 0 6px;border-bottom:1px solid var(--bg3);
-  margin-bottom:6px;
-}
-.shop-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 0;border-bottom:1px solid var(--bg3);
-}
+/* ─── SHOPPING ────────────────────────────────── */
+.shop-section{margin-bottom:14px}
+.shop-title{font-size:13px;font-weight:700;color:var(--blue);padding:8px 0 4px;border-bottom:1px solid var(--bg3);margin-bottom:4px}
+.shop-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bg3)}
 .shop-check{
-  width:20px;height:20px;border-radius:4px;
-  border:2px solid var(--text3);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:4px;border:2px solid var(--text3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .2s;flex-shrink:0;
 }
 .shop-item.bought .shop-check{border-color:var(--green);background:var(--green)}
 .shop-check svg{width:12px;height:12px;opacity:0}
 .shop-item.bought .shop-check svg{opacity:1}
 .shop-item.bought .shop-name{text-decoration:line-through;color:var(--text3)}
-.shop-name{font-size:13px;flex:1}
-.shop-qty{font-size:12px;color:var(--text2);min-width:50px;text-align:right}
-.shop-price{font-size:12px;color:var(--orange);min-width:40px;text-align:right;font-weight:600}
+.shop-name{font-size:12px;flex:1}
+.shop-qty{font-size:11px;color:var(--text2);min-width:50px;text-align:right}
+.shop-price{font-size:11px;color:var(--orange);min-width:35px;text-align:right;font-weight:600}
+.shop-total{
+  text-align:center;padding:14px;background:var(--bg2);
+  border-radius:var(--radius);margin-top:12px;font-size:14px;font-weight:600;
+}
+.shop-total span{color:var(--green)}
 
-/* ─── SWAP ────────────────────────────────────── */
-.swap-section{margin-bottom:16px}
-.swap-title{
-  font-size:13px;font-weight:600;color:var(--violet);
-  padding:8px 0;
-}
+/* ─── SWAPS ───────────────────────────────────── */
+.swap-title{font-size:12px;font-weight:600;color:var(--violet);padding:8px 0}
 .swap-row{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 12px;background:var(--bg2);
-  border-radius:var(--radius-sm);margin-bottom:6px;
-  font-size:12px;
+  display:flex;align-items:center;gap:8px;padding:7px 12px;
+  background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:5px;font-size:11px;
 }
-.swap-arrow{color:var(--violet);font-weight:700;flex-shrink:0}
+.swap-arrow{color:var(--violet);font-weight:700}
 .swap-from{color:var(--text);font-weight:600;min-width:80px}
 .swap-to{color:var(--text2);flex:1}
 
 /* ─── SETTINGS ────────────────────────────────── */
 .setting-row{
   display:flex;justify-content:space-between;align-items:center;
-  padding:14px 16px;background:var(--bg2);border-radius:var(--radius-sm);
-  margin-bottom:8px;
+  padding:12px 14px;background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:6px;
 }
-.setting-label{font-size:13px}
-.setting-value{font-size:13px;color:var(--blue);font-weight:600}
-
-/* ─── UTILS ───────────────────────────────────── */
-.section-title{
-  font-size:16px;font-weight:700;color:var(--text);
-  padding:16px 0 10px;
-}
-.badge{
-  display:inline-block;padding:3px 8px;border-radius:10px;
-  font-size:10px;font-weight:600;
-}
-.badge-blue{background:var(--blue-dim);color:var(--blue)}
-.badge-green{background:var(--green-bg);color:var(--green)}
-.badge-orange{background:var(--orange-dim);color:var(--orange)}
+.setting-label{font-size:12px}
+.setting-value{font-size:12px;color:var(--blue);font-weight:600}
+.section-title{font-size:15px;font-weight:700;padding:14px 0 8px}
 
 .reset-btn{
-  display:block;width:100%;padding:14px;margin-top:16px;
+  display:block;width:100%;padding:14px;margin-top:14px;
   background:var(--red-dim);color:var(--red);border:none;
-  border-radius:var(--radius-sm);font-size:14px;font-weight:600;
-  cursor:pointer;
+  border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;
+}
+.week-badge{
+  display:inline-block;padding:3px 10px;border-radius:12px;
+  font-size:10px;font-weight:600;background:var(--blue-dim);color:var(--blue);
+  margin-left:8px;
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════════ LOCK SCREEN ═══════════ -->
+<!-- ═══════════ LOCK ═══════════ -->
 <div class="lock-overlay" id="lockScreen">
   <div class="lock-title">NutriTrack</div>
   <div class="lock-subtitle">Entre ton code PIN</div>
   <div class="lock-dots" id="lockDots">
-    <div class="lock-dot"></div>
-    <div class="lock-dot"></div>
-    <div class="lock-dot"></div>
-    <div class="lock-dot"></div>
+    <div class="lock-dot"></div><div class="lock-dot"></div>
+    <div class="lock-dot"></div><div class="lock-dot"></div>
   </div>
   <div class="lock-error-msg" id="lockError"></div>
   <div class="lock-keypad">
@@ -295,20 +249,22 @@ body{padding-bottom:80px}
     <div class="date-label" id="dateLabel"></div>
   </div>
 
+  <div class="day-selector" id="daySelector"></div>
+
   <div class="day-toggle">
-    <button id="btnOn" onclick="setDayType('on')">Jour de séance</button>
-    <button id="btnOff" onclick="setDayType('off')">Jour de repos</button>
+    <button id="btnOn" onclick="setDayType('on')">Séance</button>
+    <button id="btnOff" onclick="setDayType('off')">Repos</button>
   </div>
 
   <div class="progress-section">
     <div class="ring-container">
-      <svg width="90" height="90" viewBox="0 0 90 90">
-        <circle class="ring-bg" cx="45" cy="45" r="38"/>
-        <circle class="ring-fill" id="protRing" cx="45" cy="45" r="38"
-          stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
+      <svg width="85" height="85" viewBox="0 0 85 85">
+        <circle class="ring-bg" cx="42.5" cy="42.5" r="36"/>
+        <circle class="ring-fill" id="protRing" cx="42.5" cy="42.5" r="36"
+          stroke-dasharray="226.19" stroke-dashoffset="226.19"/>
       </svg>
       <div class="ring-text">
-        <div class="ring-value" id="protValue">0</div>
+        <div class="ring-value" id="protValue">0g</div>
         <div class="ring-label">protéines</div>
       </div>
     </div>
@@ -337,11 +293,12 @@ body{padding-bottom:80px}
 <!-- ═══════════ PAGE COURSES ═══════════ -->
 <div id="page-shop" class="page">
   <div class="header">
-    <h1>Liste de courses</h1>
-    <div class="subtitle">Grand Frais — Semaine type</div>
+    <h1>Courses de la semaine</h1>
+    <div class="subtitle">Grand Frais — basé sur tes repas</div>
   </div>
   <div id="shopList"></div>
-  <button class="reset-btn" onclick="resetShop()">Réinitialiser la liste</button>
+  <div class="shop-total" id="shopTotal"></div>
+  <button class="reset-btn" onclick="resetShop()" style="margin-top:10px">Réinitialiser la liste</button>
 </div>
 
 <!-- ═══════════ PAGE SWAPS ═══════════ -->
@@ -365,304 +322,436 @@ body{padding-bottom:80px}
   <div class="setting-row"><span class="setting-label">Poids actuel</span><span class="setting-value">98-100 kg</span></div>
   <div class="setting-row"><span class="setting-label">Objectif</span><span class="setting-value">Recomposition</span></div>
   <div class="setting-row"><span class="setting-label">Budget courses</span><span class="setting-value">490 EUR/mois</span></div>
-
-  <div class="section-title">Compléments</div>
+  <div class="section-title">Compléments Nutripure</div>
   <div class="setting-row"><span class="setting-label">Créatine Creapure</span><span class="setting-value">5g / jour</span></div>
   <div class="setting-row"><span class="setting-label">D3 + K2 MK-7</span><span class="setting-value">3 gouttes matin</span></div>
   <div class="setting-row"><span class="setting-label">Whey Isolate Native</span><span class="setting-value">25g / dose</span></div>
   <div class="setting-row"><span class="setting-label">Magnésium Taurine B6</span><span class="setting-value">2 gél. soir</span></div>
-
   <div class="section-title">Sport</div>
   <div class="setting-row"><span class="setting-label">Activité</span><span class="setting-value">Street workout</span></div>
   <div class="setting-row"><span class="setting-label">Fréquence</span><span class="setting-value">2-4x / semaine</span></div>
-
   <button class="reset-btn" onclick="resetAll()">Réinitialiser toutes les données</button>
 </div>
 
-<!-- ═══════════ NAVIGATION ═══════════ -->
+<!-- ═══════════ NAV ═══════════ -->
 <nav class="nav">
-  <button class="nav-btn active" data-page="page-today" onclick="showPage('page-today',this)">
+  <button class="nav-btn active" onclick="showPage('page-today',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
     <span>Aujourd'hui</span>
   </button>
-  <button class="nav-btn" data-page="page-shop" onclick="showPage('page-shop',this)">
+  <button class="nav-btn" onclick="showPage('page-shop',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
     <span>Courses</span>
   </button>
-  <button class="nav-btn" data-page="page-swap" onclick="showPage('page-swap',this)">
+  <button class="nav-btn" onclick="showPage('page-swap',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
     <span>Swaps</span>
   </button>
-  <button class="nav-btn" data-page="page-profile" onclick="showPage('page-profile',this)">
+  <button class="nav-btn" onclick="showPage('page-profile',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Profil</span>
   </button>
 </nav>
 
 <script>
-// ─── DATA ────────────────────────────────────────
-const MEALS = {
-  on: [
-    {
-      id:'m1', name:'Petit-déjeuner', time:'7h00 - 7h30', prot:42, cal:480,
-      foods:[
-        {name:'Oeufs brouillés', qty:'3 oeufs'},
-        {name:'Pain complet', qty:'1 tranche'},
-        {name:'Fromage blanc 0%', qty:'150g'},
-        {name:'Banane', qty:'1'},
-      ],
-      supps:'Créatine 5g + D3K2 3 gouttes (sur les oeufs)',
-      timeRange:[6,8]
-    },
-    {
-      id:'m2', name:'Post-training', time:'9h00', prot:24, cal:100,
-      foods:[
-        {name:'Whey Isolate Native', qty:'25g (1 dose)'},
-        {name:'Eau', qty:'250ml'},
-      ],
-      supps:null,
-      timeRange:[8,10]
-    },
-    {
-      id:'m3', name:'Déjeuner', time:'12h30', prot:45, cal:520,
-      foods:[
-        {name:'Wrap / tortilla', qty:'1'},
-        {name:'Thon en conserve', qty:'120g'},
-        {name:'Emmental râpé', qty:'30g'},
-        {name:'Salade, tomate, concombre', qty:'garniture'},
-        {name:'Moutarde', qty:'1 cuillère'},
-        {name:'Pomme', qty:'1'},
-      ],
-      supps:null,
-      timeRange:[11,14]
-    },
-    {
-      id:'m4', name:'Collation', time:'16h00', prot:18, cal:260,
-      foods:[
-        {name:'Viande des Grisons', qty:'30g'},
-        {name:'Amandes nature', qty:'30g'},
-        {name:'Kiwi', qty:'1'},
-      ],
-      supps:null,
-      timeRange:[15,17]
-    },
-    {
-      id:'m5', name:'Dîner', time:'19h30', prot:62, cal:650,
-      foods:[
-        {name:'Filet de poulet grillé', qty:'200g'},
-        {name:'Lentilles vertes', qty:'80g (sec)'},
-        {name:'Brocoli vapeur', qty:'150g'},
-        {name:'Huile d\'olive', qty:'1 cs'},
-      ],
-      supps:'Magnésium Taurine B6 — 2 gélules à 21h30',
-      timeRange:[18,22]
-    },
-  ],
-  off: [
-    {
-      id:'r1', name:'Petit-déjeuner', time:'7h30 - 8h00', prot:25, cal:450,
-      foods:[
-        {name:'Oeufs au plat', qty:'3 oeufs'},
-        {name:'Avocat', qty:'1/2'},
-        {name:'Pain complet', qty:'1 tranche'},
-      ],
-      supps:'Créatine 5g + D3K2 3 gouttes',
-      timeRange:[6,9]
-    },
-    {
-      id:'r2', name:'Déjeuner', time:'12h30', prot:48, cal:550,
-      foods:[
-        {name:'Pain complet', qty:'sandwich'},
-        {name:'Poulet froid (rôti veille)', qty:'100g'},
-        {name:'Comté', qty:'30g'},
-        {name:'Salade, tomate', qty:'garniture'},
-        {name:'Moutarde', qty:'1 cuillère'},
-        {name:'Fromage blanc 0%', qty:'150g'},
-      ],
-      supps:null,
-      timeRange:[11,14]
-    },
-    {
-      id:'r3', name:'Collation', time:'16h00', prot:26, cal:190,
-      foods:[
-        {name:'Whey Isolate Native', qty:'25g (1 dose)'},
-        {name:'Banane', qty:'1'},
-      ],
-      supps:null,
-      timeRange:[15,17]
-    },
-    {
-      id:'r4', name:'Dîner', time:'19h30', prot:50, cal:530,
-      foods:[
-        {name:'Cabillaud au four', qty:'200g'},
-        {name:'Quinoa', qty:'80g (sec)'},
-        {name:'Épinards sautés à l\'ail', qty:'200g'},
-        {name:'Citron', qty:'1/2'},
-      ],
-      supps:'Magnésium Taurine B6 — 2 gélules à 21h30',
-      timeRange:[18,22]
-    },
-    {
-      id:'r5', name:'Snack soir', time:'21h00', prot:17, cal:180,
-      foods:[
-        {name:'Fromage blanc 0%', qty:'150g'},
-        {name:'Graines de courge', qty:'20g'},
-      ],
-      supps:null,
-      timeRange:[20,22]
-    },
-  ]
+// ═══════════════════════════════════════════════════════════════
+// DATA — Repas variés pour chaque jour de la semaine
+// ═══════════════════════════════════════════════════════════════
+
+// 3 variantes petit-déj
+const BREAKFASTS = [
+  {
+    name:'Oeufs brouillés + fromage blanc',
+    foods:[{n:'Oeufs brouillés',q:'3'},{n:'Pain complet',q:'1 tranche'},{n:'Fromage blanc 0%',q:'150g'},{n:'Banane',q:'1'}],
+    prot:42, cal:480,
+    supps:'Créatine 5g + D3K2 3 gouttes (sur les oeufs)'
+  },
+  {
+    name:'Oeufs au plat + avocat',
+    foods:[{n:'Oeufs au plat',q:'3'},{n:'Avocat',q:'1/2'},{n:'Pain complet',q:'1 tranche'},{n:'Kiwi',q:'1'}],
+    prot:27, cal:460,
+    supps:'Créatine 5g + D3K2 3 gouttes'
+  },
+  {
+    name:'Overnight oats protéinés',
+    foods:[{n:'Flocons d\'avoine',q:'60g'},{n:'Fromage blanc 0%',q:'150g'},{n:'Whey nature',q:'25g'},{n:'Amandes',q:'20g'},{n:'Banane',q:'1'}],
+    prot:45, cal:550,
+    supps:'Créatine 5g + D3K2 3 gouttes (dans un verre)'
+  },
+];
+
+// 7 déjeuners — Lun-Ven chez Marie Blachère, weekend maison
+// Valentin prend en général 1 sandwich + 4 mini wraps/viennois/pains
+const LUNCHES = [
+  {
+    name:'Marie Blachère — Poulet crudités',
+    foods:[{n:'Sandwich poulet crudités',q:'1 (335g)'},{n:'P\'tit viennois thon',q:'1'},{n:'Eau',q:'50cl'}],
+    prot:55, cal:1050,
+    note:'Le poulet crudités = 43g prot. Privilégie ce sandwich.'
+  },
+  {
+    name:'Marie Blachère — Thon + p\'tits',
+    foods:[{n:'Sandwich thon crudités',q:'1'},{n:'P\'tit jambon beurre',q:'2'},{n:'Eau',q:'50cl'}],
+    prot:40, cal:900,
+    note:'Thon = bonne source protéines. Évite les viennois sucrés.'
+  },
+  {
+    name:'Marie Blachère — Jambon emmental + wraps',
+    foods:[{n:'Sandwich jambon emmental',q:'1'},{n:'Wrap poulet',q:'1'},{n:'P\'tit jambon beurre',q:'1'},{n:'Eau',q:'50cl'}],
+    prot:35, cal:850,
+    note:'Attention : jambon emmental = seulement 6g prot pour 464 kcal. Complète avec un wrap poulet.'
+  },
+  {
+    name:'Marie Blachère — Poulet + mini wraps',
+    foods:[{n:'Sandwich poulet crudités',q:'1 (335g)'},{n:'P\'tit wrap poulet',q:'1'},{n:'Eau',q:'50cl'}],
+    prot:52, cal:1050,
+    note:'Le poulet crudités = 43g prot. Rajoute un wrap pour compléter.'
+  },
+  {
+    name:'Marie Blachère — Mix protéiné',
+    foods:[{n:'Wrap poulet',q:'2'},{n:'P\'tit viennois thon',q:'2'},{n:'Eau',q:'50cl'}],
+    prot:42, cal:800,
+    note:'Plusieurs petits = plus de variété.'
+  },
+  {
+    name:'Weekend — Bowl maison protéiné',
+    foods:[{n:'Crevettes cuites',q:'150g'},{n:'Quinoa cuit',q:'100g'},{n:'Avocat',q:'1/2'},{n:'Tomate cerise',q:'100g'},{n:'Concombre',q:'1/2'},{n:'Feta',q:'30g'},{n:'Huile olive + citron',q:'1 cs'}],
+    prot:42, cal:520
+  },
+  {
+    name:'Weekend — Omelette garnie',
+    foods:[{n:'Oeufs',q:'4'},{n:'Jambon blanc',q:'2 tranches'},{n:'Emmental râpé',q:'30g'},{n:'Salade verte',q:'garniture'},{n:'Pain complet',q:'1 tranche'}],
+    prot:45, cal:550
+  },
+];
+
+// 7 dîners différents (un par jour)
+const DINNERS = [
+  {
+    name:'Poulet grillé, lentilles, brocoli',
+    foods:[{n:'Filet de poulet',q:'200g'},{n:'Lentilles vertes (sec)',q:'80g'},{n:'Brocoli',q:'150g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Ail, curcuma',q:''}],
+    prot:58, cal:620,
+    recipe:'Lentilles 20 min à l\'eau. Poulet en lanières saisi 5 min. Brocoli sauté 5 min avec ail. Assembler.'
+  },
+  {
+    name:'Cabillaud au four, quinoa, épinards',
+    foods:[{n:'Filet de cabillaud',q:'200g'},{n:'Quinoa (sec)',q:'80g'},{n:'Épinards frais',q:'200g'},{n:'Citron',q:'1/2'},{n:'Ail',q:'1 gousse'}],
+    prot:48, cal:500,
+    recipe:'Quinoa 12 min. Cabillaud au four 15 min à 200°C. Épinards sautés 2 min avec ail. Citron sur le poisson.'
+  },
+  {
+    name:'Steak haché, patate douce, haricots verts',
+    foods:[{n:'Steak haché 5%',q:'200g'},{n:'Patate douce',q:'200g'},{n:'Haricots verts',q:'150g'},{n:'Oignon',q:'1'},{n:'Herbes de Provence',q:''}],
+    prot:50, cal:600,
+    recipe:'Patate douce en cubes 15 min vapeur. Haricots 10 min. Steak saisi avec oignon émincé.'
+  },
+  {
+    name:'Saumon, riz complet, courgettes',
+    foods:[{n:'Pavé de saumon',q:'180g'},{n:'Riz complet (sec)',q:'80g'},{n:'Courgettes',q:'200g'},{n:'Sauce soja',q:'1 cs'},{n:'Gingembre frais',q:'1 cm'}],
+    prot:44, cal:620,
+    recipe:'Riz complet 25 min. Saumon poêlé 4 min/face. Courgettes en rondelles sautées au wok avec soja et gingembre.'
+  },
+  {
+    name:'Dinde, boulgour, poivrons',
+    foods:[{n:'Escalope de dinde',q:'200g'},{n:'Boulgour (sec)',q:'80g'},{n:'Poivrons (rouge+jaune)',q:'200g'},{n:'Huile d\'olive',q:'1 cs'},{n:'Paprika, cumin',q:''}],
+    prot:54, cal:580,
+    recipe:'Boulgour 10 min. Dinde en morceaux saisie 5 min feu vif. Poivrons en lanières sautés 5 min. Épices.'
+  },
+  {
+    name:'Filet mignon, haricots rouges, salade',
+    foods:[{n:'Filet mignon de porc',q:'200g'},{n:'Haricots rouges (conserve)',q:'200g'},{n:'Salade mélangée',q:'100g'},{n:'Tomate',q:'1'},{n:'Huile olive + vinaigre',q:'1 cs'}],
+    prot:52, cal:560,
+    recipe:'Filet mignon tranché, saisi 5 min. Haricots rouges réchauffés 3 min. Salade + tomate en vinaigrette.'
+  },
+  {
+    name:'Truite, pois chiches, asperges',
+    foods:[{n:'Filet de truite',q:'200g'},{n:'Pois chiches (conserve)',q:'200g'},{n:'Asperges vertes',q:'1 botte'},{n:'Citron',q:'1/2'},{n:'Persil frais',q:''}],
+    prot:50, cal:540,
+    recipe:'Truite + asperges au four 15 min à 200°C. Pois chiches en poêle avec paprika 3 min. Citron + persil.'
+  },
+];
+
+// Collations (2 variantes : post-training et repos)
+const SNACK_TRAINING = {
+  name:'Post-training',time:'9h00',
+  foods:[{n:'Whey Isolate Native',q:'25g (1 dose)'},{n:'Eau',q:'250ml'}],
+  prot:24, cal:100
 };
 
+const SNACKS = [
+  {name:'Grisons + amandes',foods:[{n:'Viande des Grisons',q:'30g'},{n:'Amandes nature',q:'25g'},{n:'Kiwi',q:'1'}],prot:18,cal:250},
+  {name:'Fromage blanc + graines',foods:[{n:'Fromage blanc 0%',q:'200g'},{n:'Graines de courge',q:'20g'},{n:'Miel',q:'1 cc'}],prot:20,cal:200},
+  {name:'Oeuf dur + noix',foods:[{n:'Oeufs durs',q:'2'},{n:'Noix',q:'20g'},{n:'Pomme',q:'1'}],prot:17,cal:280},
+  {name:'Whey + banane',foods:[{n:'Whey Isolate Native',q:'25g'},{n:'Banane',q:'1'}],prot:26,cal:190},
+  {name:'Bresaola + parmesan',foods:[{n:'Bresaola',q:'40g'},{n:'Parmesan',q:'15g'},{n:'Tomate cerise',q:'5'}],prot:20,cal:170},
+  {name:'Cacahuètes + chocolat noir',foods:[{n:'Cacahuètes nature',q:'30g'},{n:'Chocolat noir 70%',q:'2 carrés (20g)'}],prot:11,cal:250},
+  {name:'Cottage cheese + fruit',foods:[{n:'Cottage cheese',q:'150g'},{n:'Myrtilles',q:'80g'}],prot:19,cal:190},
+];
+
+const EVENING_SNACK = {
+  name:'Snack soir (si besoin)',time:'21h00',
+  foods:[{n:'Fromage blanc 0%',q:'150g'},{n:'Graines de courge',q:'15g'}],
+  prot:15, cal:150,
+  supps:'Magnésium Taurine B6 — 2 gélules'
+};
+
+// Jour de la semaine → index dans les tableaux
+// breakfastIndex: 0=oeufs brouillés, 1=oeufs au plat, 2=overnight
+const WEEK_PLAN = [
+  {day:'Lun', bk:0, lunch:0, dinner:0, snack:0},
+  {day:'Mar', bk:1, lunch:1, dinner:1, snack:1},
+  {day:'Mer', bk:2, lunch:2, dinner:2, snack:2},
+  {day:'Jeu', bk:0, lunch:3, dinner:3, snack:3},
+  {day:'Ven', bk:1, lunch:4, dinner:4, snack:4},
+  {day:'Sam', bk:2, lunch:5, dinner:5, snack:5},
+  {day:'Dim', bk:0, lunch:6, dinner:6, snack:6},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// LISTE DE COURSES — cohérente avec les repas de la semaine
+// ═══════════════════════════════════════════════════════════════
 const SHOPPING = [
-  {
-    section:'Boucherie', items:[
-      {name:'Filets de poulet', qty:'600g', price:'~7€'},
-      {name:'Escalopes de dinde', qty:'400g', price:'~6€'},
-      {name:'Steak haché 5%', qty:'400g', price:'~5€'},
-      {name:'Filet mignon de porc', qty:'400g', price:'~6€'},
-      {name:'Jambon blanc supérieur', qty:'6 tranches', price:'~3€'},
-    ]
-  },
-  {
-    section:'Poissonnerie', items:[
-      {name:'Cabillaud (filets)', qty:'400g', price:'~8€'},
-      {name:'Saumon (pavé)', qty:'360g', price:'~8€'},
-      {name:'Truite (filets)', qty:'400g', price:'~7€'},
-    ]
-  },
-  {
-    section:'Crèmerie / Fromagerie', items:[
-      {name:'Oeufs', qty:'18 (plaque)', price:'~5€'},
-      {name:'Fromage blanc 0%', qty:'1 kg', price:'~3€'},
-      {name:'Emmental râpé', qty:'200g', price:'~2€'},
-      {name:'Comté', qty:'150g', price:'~4€'},
-    ]
-  },
-  {
-    section:'Fruits & Légumes', items:[
-      {name:'Brocoli', qty:'500g', price:'~2€'},
-      {name:'Épinards frais', qty:'400g', price:'~3€'},
-      {name:'Haricots verts', qty:'400g', price:'~3€'},
-      {name:'Courgettes', qty:'400g', price:'~2€'},
-      {name:'Poivrons', qty:'3 pièces', price:'~3€'},
-      {name:'Salade', qty:'2 pièces', price:'~2€'},
-      {name:'Tomates', qty:'1 kg', price:'~3€'},
-      {name:'Concombre', qty:'1 pièce', price:'~1€'},
-      {name:'Patate douce', qty:'500g', price:'~2€'},
-      {name:'Avocat', qty:'3 pièces', price:'~3€'},
-      {name:'Bananes', qty:'1 kg', price:'~2€'},
-      {name:'Pommes', qty:'1 kg', price:'~3€'},
-      {name:'Kiwis', qty:'6 pièces', price:'~3€'},
-      {name:'Citrons', qty:'3 pièces', price:'~1€'},
-      {name:'Ail + oignons', qty:'1 tête + 3', price:'~2€'},
-      {name:'Herbes fraîches', qty:'1-2 bouquets', price:'~2€'},
-    ]
-  },
-  {
-    section:'Épicerie (mensuel)', items:[
-      {name:'Thon en conserve naturel', qty:'6 boîtes', price:'~8€'},
-      {name:'Lentilles vertes', qty:'500g', price:'~2€'},
-      {name:'Quinoa', qty:'500g', price:'~4€'},
-      {name:'Riz complet', qty:'1 kg', price:'~3€'},
-      {name:'Boulgour', qty:'500g', price:'~2€'},
-      {name:'Pois chiches', qty:'500g', price:'~2€'},
-      {name:'Haricots rouges', qty:'500g', price:'~2€'},
-      {name:'Flocons d\'avoine', qty:'500g', price:'~2€'},
-      {name:'Amandes nature', qty:'200g', price:'~4€'},
-      {name:'Graines de courge', qty:'200g', price:'~4€'},
-      {name:'Viande des Grisons', qty:'2 paquets', price:'~6€'},
-      {name:'Pain complet', qty:'1 paquet', price:'~3€'},
-      {name:'Wraps / tortillas', qty:'1 paquet', price:'~3€'},
-      {name:'Huile d\'olive', qty:'500ml', price:'~5€'},
-      {name:'Moutarde', qty:'1 pot', price:'~2€'},
-    ]
-  }
+  {section:'Boucherie (Grand Frais)',items:[
+    {name:'Filets de poulet',qty:'400g',price:'5€',usage:'Dîner lundi'},
+    {name:'Escalopes de dinde',qty:'400g',price:'6€',usage:'Dîner vendredi'},
+    {name:'Steak haché 5%',qty:'400g',price:'5€',usage:'Dîner mercredi'},
+    {name:'Filet mignon de porc',qty:'300g',price:'5€',usage:'Dîner samedi'},
+    {name:'Jambon blanc supérieur',qty:'4 tranches',price:'2€',usage:'Omelette weekend'},
+    {name:'Viande des Grisons',qty:'1 paquet',price:'3€',usage:'Collation lundi'},
+    {name:'Bresaola',qty:'1 paquet',price:'4€',usage:'Collation vendredi'},
+  ]},
+  {section:'Poissonnerie (Grand Frais)',items:[
+    {name:'Cabillaud (filets)',qty:'200g',price:'5€',usage:'Dîner mardi'},
+    {name:'Pavé de saumon',qty:'180g',price:'5€',usage:'Dîner jeudi'},
+    {name:'Truite (filets)',qty:'200g',price:'4€',usage:'Dîner dimanche'},
+    {name:'Crevettes cuites',qty:'150g',price:'4€',usage:'Bowl samedi'},
+  ]},
+  {section:'Crèmerie / Fromagerie (Grand Frais)',items:[
+    {name:'Oeufs',qty:'18 (plaque)',price:'5€',usage:'Petit-déj quotidien + omelette weekend'},
+    {name:'Fromage blanc 0%',qty:'1.5 kg',price:'4€',usage:'Petit-déj + collations + snack soir'},
+    {name:'Emmental râpé',qty:'150g',price:'2€',usage:'Omelette + plats'},
+    {name:'Parmesan',qty:'50g',price:'2€',usage:'Collation vendredi'},
+    {name:'Feta',qty:'100g',price:'2€',usage:'Bowl samedi'},
+    {name:'Cottage cheese',qty:'1 pot',price:'2€',usage:'Collation dimanche'},
+  ]},
+  {section:'Fruits & Légumes (Grand Frais)',items:[
+    {name:'Brocoli',qty:'300g',price:'2€',usage:'Dîner lundi'},
+    {name:'Épinards frais',qty:'200g',price:'2€',usage:'Dîner mardi'},
+    {name:'Haricots verts',qty:'200g',price:'2€',usage:'Dîner mercredi'},
+    {name:'Courgettes',qty:'300g',price:'2€',usage:'Dîner jeudi'},
+    {name:'Poivrons rouge+jaune',qty:'2 pièces',price:'2€',usage:'Dîner vendredi'},
+    {name:'Asperges vertes',qty:'1 botte',price:'4€',usage:'Dîner dimanche'},
+    {name:'Patate douce',qty:'250g',price:'1€',usage:'Dîner mercredi'},
+    {name:'Salade verte',qty:'1 pièce',price:'1€',usage:'Omelette weekend + dîner'},
+    {name:'Tomates',qty:'500g',price:'2€',usage:'Dîner samedi + weekend'},
+    {name:'Tomates cerise',qty:'250g',price:'2€',usage:'Collation + bowl'},
+    {name:'Concombre',qty:'1 pièce',price:'1€',usage:'Bowl samedi'},
+    {name:'Avocats',qty:'3 pièces',price:'3€',usage:'Petit-déj mardi/vendredi'},
+    {name:'Bananes',qty:'1 kg (~6)',price:'2€',usage:'Petit-déj + collation'},
+    {name:'Pommes',qty:'500g',price:'2€',usage:'Collation'},
+    {name:'Kiwis',qty:'4 pièces',price:'2€',usage:'Petit-déj + collation'},
+    {name:'Citrons',qty:'3 pièces',price:'1€',usage:'Poisson + vinaigrette'},
+    {name:'Myrtilles',qty:'125g',price:'3€',usage:'Collation dimanche'},
+    {name:'Ail + oignons',qty:'1 tête + 2',price:'1€',usage:'Cuisine'},
+    {name:'Gingembre frais',qty:'1 morceau',price:'1€',usage:'Dîner jeudi'},
+    {name:'Persil frais',qty:'1 bouquet',price:'1€',usage:'Dîner dimanche'},
+  ]},
+  {section:'Épicerie (Grand Frais)',items:[
+    {name:'Lentilles vertes',qty:'250g',price:'1€',usage:'Dîner lundi'},
+    {name:'Quinoa',qty:'250g',price:'2€',usage:'Dîner mardi + bowl'},
+    {name:'Riz complet',qty:'250g',price:'1€',usage:'Dîner jeudi'},
+    {name:'Boulgour',qty:'250g',price:'1€',usage:'Dîner vendredi'},
+    {name:'Pois chiches (conserve)',qty:'1 boîte',price:'1€',usage:'Dîner dimanche'},
+    {name:'Haricots rouges (conserve)',qty:'1 boîte',price:'1€',usage:'Dîner samedi'},
+    {name:'Flocons d\'avoine',qty:'300g',price:'1€',usage:'Overnight oats (mer+sam)'},
+    {name:'Pain complet',qty:'1 paquet',price:'3€',usage:'Petit-déj'},
+    {name:'Amandes nature',qty:'150g',price:'3€',usage:'Collations + overnight oats'},
+    {name:'Graines de courge',qty:'100g',price:'2€',usage:'Collations + snack soir'},
+    {name:'Noix',qty:'100g',price:'2€',usage:'Collation mercredi'},
+    {name:'Cacahuètes nature',qty:'100g',price:'1€',usage:'Collation samedi'},
+    {name:'Chocolat noir 70%',qty:'1 tablette',price:'2€',usage:'Collation samedi'},
+    {name:'Miel',qty:'1 pot (si vide)',price:'3€',usage:'Collation mardi'},
+    {name:'Huile d\'olive',qty:'(stock)',price:'—',usage:'Cuisson'},
+    {name:'Sauce soja',qty:'1 bouteille',price:'2€',usage:'Dîner jeudi'},
+  ]},
+  {section:'Marie Blachère (midi Lun-Ven)',items:[
+    {name:'Sandwich poulet crudités',qty:'x2 /sem',price:'~10€',usage:'Lundi + jeudi — le plus protéiné'},
+    {name:'Sandwich thon crudités',qty:'x1 /sem',price:'~5€',usage:'Mardi'},
+    {name:'Wrap poulet',qty:'x3 /sem',price:'~6€',usage:'Mercredi + vendredi'},
+    {name:'P\'tit viennois thon',qty:'x2 /sem',price:'~3€',usage:'Complément lundi'},
+    {name:'P\'tit jambon beurre',qty:'x2 /sem',price:'~3€',usage:'Complément mardi'},
+    {name:'P\'tit wrap poulet',qty:'x2 /sem',price:'~4€',usage:'Complément jeudi + vendredi'},
+  ]},
 ];
 
 const SWAPS = [
-  {cat:'Protéines viande', from:'Poulet', to:'Dinde, Lapin, Veau, Pintade, Filet mignon'},
-  {cat:'Protéines viande', from:'Steak haché', to:'Rumsteck, Onglet, Hampe, Bavette'},
-  {cat:'Protéines poisson', from:'Cabillaud', to:'Lieu noir, Colin, Merlu, Daurade, Lotte'},
-  {cat:'Protéines poisson', from:'Saumon', to:'Truite, Maquereau'},
-  {cat:'Protéines poisson', from:'Thon conserve', to:'Sardines, Maquereau conserve'},
-  {cat:'Protéines charcuterie', from:'Grisons', to:'Bresaola, Jambon blanc'},
-  {cat:'Féculents', from:'Lentilles', to:'Pois chiches, Haricots rouges, Fèves'},
-  {cat:'Féculents', from:'Quinoa', to:'Boulgour, Riz complet, Semoule'},
-  {cat:'Féculents', from:'Patate douce', to:'Pomme de terre, Riz'},
-  {cat:'Légumes', from:'Brocoli', to:'Chou-fleur, Kale, Asperges'},
-  {cat:'Légumes', from:'Épinards', to:'Blettes, Haricots verts'},
-  {cat:'Légumes', from:'Courgette', to:'Aubergine, Poivrons, Champignons'},
-  {cat:'Collation', from:'Amandes', to:'Noix de cajou, Cacahuètes, Graines courge'},
-  {cat:'Petit-déj', from:'Oeufs brouillés', to:'Omelette, Oeufs au plat, Overnight oats'},
+  {cat:'Protéines viande',from:'Poulet',to:'Dinde, Lapin, Veau, Pintade'},
+  {cat:'Protéines viande',from:'Steak haché',to:'Rumsteck, Onglet, Hampe, Bavette'},
+  {cat:'Protéines viande',from:'Filet mignon',to:'Rôti de porc, Escalope veau'},
+  {cat:'Protéines poisson',from:'Cabillaud',to:'Lieu noir, Colin, Merlu, Daurade, Lotte'},
+  {cat:'Protéines poisson',from:'Saumon',to:'Truite, Maquereau, Espadon'},
+  {cat:'Protéines poisson',from:'Thon conserve',to:'Sardines, Maquereau conserve'},
+  {cat:'Protéines poisson',from:'Crevettes',to:'Calamar, Langoustine'},
+  {cat:'Charcuterie',from:'Grisons',to:'Bresaola, Jambon blanc, Jambon cru'},
+  {cat:'Féculents',from:'Lentilles',to:'Pois chiches, Haricots rouges, Fèves'},
+  {cat:'Féculents',from:'Quinoa',to:'Boulgour, Riz complet, Semoule'},
+  {cat:'Féculents',from:'Patate douce',to:'Pomme de terre, Riz basmati'},
+  {cat:'Légumes',from:'Brocoli',to:'Chou-fleur, Kale, Asperges'},
+  {cat:'Légumes',from:'Épinards',to:'Blettes, Haricots verts'},
+  {cat:'Légumes',from:'Courgette',to:'Aubergine, Poivrons, Champignons'},
+  {cat:'Fromages',from:'Comté',to:'Emmental, Beaufort, Cantal'},
+  {cat:'Fromages',from:'Feta',to:'Mozzarella, Chèvre frais'},
+  {cat:'Collation',from:'Amandes',to:'Noix de cajou, Cacahuètes, Graines courge'},
+  {cat:'Petit-déj',from:'Oeufs brouillés',to:'Omelette, Oeufs pochés, Oeufs cocotte'},
+  {cat:'Petit-déj',from:'Overnight oats',to:'Porridge chaud, Smoothie protéiné'},
 ];
 
-// ─── STATE ───────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
 const TODAY = new Date().toISOString().slice(0,10);
+let selectedDayIndex = new Date().getDay(); // 0=dim
+// Convert to our index (0=lun)
+selectedDayIndex = selectedDayIndex === 0 ? 6 : selectedDayIndex - 1;
+
 let state = loadState();
-
 function loadState(){
-  try{
-    const s = JSON.parse(localStorage.getItem('nutritrack'));
-    if(s && s.date === TODAY) return s;
-  } catch(e){}
-  return {date:TODAY, dayType:'on', checked:{}, shopBought:{}};
+  try{const s=JSON.parse(localStorage.getItem('nt2'));if(s&&s.date===TODAY)return s}catch(e){}
+  return{date:TODAY,dayTypes:{},checked:{},shopBought:{}};
 }
-function saveState(){localStorage.setItem('nutritrack',JSON.stringify(state))}
+function saveState(){localStorage.setItem('nt2',JSON.stringify(state))}
 
-// ─── NAVIGATION ──────────────────────────────────
-function showPage(id, btn){
+function getDayType(idx){return state.dayTypes[idx]||'off'}
+function setDayType(type){
+  state.dayTypes[selectedDayIndex]=type;
+  saveState();
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-// ─── DATE ────────────────────────────────────────
-function updateDate(){
-  const d = new Date();
-  const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  document.getElementById('dateLabel').textContent =
-    `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function render(){
+  updateDate();
+  renderDaySelector();
+  renderMeals();
+  updateProgress();
 }
 
-// ─── DAY TYPE ────────────────────────────────────
-function setDayType(type){
-  state.dayType = type;
-  state.checked = {};
-  saveState();
+function updateDate(){
+  const d=new Date();
+  const days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  document.getElementById('dateLabel').textContent=`${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function renderDaySelector(){
+  const now=new Date();
+  const todayIdx=now.getDay()===0?6:now.getDay()-1;
+  const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+  // Get monday of this week
+  const monday=new Date(now);
+  monday.setDate(now.getDate()-(now.getDay()===0?6:now.getDay()-1));
+
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);
+    d.setDate(monday.getDate()+i);
+    const cls=['day-btn'];
+    if(i===selectedDayIndex)cls.push('active');
+    if(i===todayIdx)cls.push('today');
+    html+=`<button class="${cls.join(' ')}" onclick="selectDay(${i})">
+      <span class="day-name">${dayNames[i]}</span>
+      <span class="day-num">${d.getDate()}</span>
+    </button>`;
+  }
+  document.getElementById('daySelector').innerHTML=html;
+
+  const type=getDayType(selectedDayIndex);
+  document.getElementById('btnOn').classList.toggle('active',type==='on');
+  document.getElementById('btnOff').classList.toggle('active',type==='off');
+}
+
+function selectDay(idx){
+  selectedDayIndex=idx;
   render();
 }
 
-// ─── RENDER MEALS ────────────────────────────────
-function render(){
-  updateDate();
-  const type = state.dayType;
-  document.getElementById('btnOn').classList.toggle('active', type==='on');
-  document.getElementById('btnOff').classList.toggle('active', type==='off');
+function getMealsForDay(dayIdx){
+  const plan=WEEK_PLAN[dayIdx];
+  const type=getDayType(dayIdx);
+  const meals=[];
+  const dayKey=dayIdx;
 
-  const meals = MEALS[type];
-  const hour = new Date().getHours();
-  let html = '';
+  // Petit-déj
+  const bk=BREAKFASTS[plan.bk];
+  meals.push({id:`${dayKey}-bk`,name:bk.name,time:'7h00 - 8h00',prot:bk.prot,cal:bk.cal,
+    foods:bk.foods.map(f=>({name:f.n,qty:f.q})),supps:bk.supps,timeRange:[6,9]});
 
-  meals.forEach(m => {
-    const done = state.checked[m.id] || false;
-    const isCurrent = !done && hour >= m.timeRange[0] && hour < m.timeRange[1];
-    const classes = [
-      'meal-card',
-      done ? 'done' : '',
-      isCurrent ? 'current' : ''
-    ].filter(Boolean).join(' ');
+  // Post-training (only on training days)
+  if(type==='on'){
+    meals.push({id:`${dayKey}-pt`,name:'Shaker post-training',time:'9h00',prot:24,cal:100,
+      foods:[{name:'Whey Isolate Native',qty:'25g'},{name:'Eau',qty:'250ml'}],supps:null,timeRange:[8,10]});
+  }
 
-    let foodsHtml = m.foods.map(f =>
-      `<div class="meal-food"><span class="food-name">${f.name}</span><span class="food-qty">${f.qty}</span></div>`
+  // Déjeuner
+  const lu=LUNCHES[plan.lunch];
+  meals.push({id:`${dayKey}-lu`,name:lu.name,time:'12h30',prot:lu.prot,cal:lu.cal,
+    foods:lu.foods.map(f=>({name:f.n,qty:f.q})),supps:null,timeRange:[11,14]});
+
+  // Collation
+  const sn=SNACKS[plan.snack];
+  meals.push({id:`${dayKey}-sn`,name:sn.name,time:'16h00',prot:sn.prot,cal:sn.cal,
+    foods:sn.foods.map(f=>({name:f.n,qty:f.q})),supps:null,timeRange:[15,17]});
+
+  // Dîner
+  const di=DINNERS[plan.dinner];
+  meals.push({id:`${dayKey}-di`,name:di.name,time:'19h30',prot:di.prot,cal:di.cal,
+    foods:di.foods.map(f=>({name:f.n,qty:f.q})),supps:'Magnésium Taurine B6 — 2 gélules à 21h30',
+    recipe:di.recipe,timeRange:[18,22]});
+
+  // Snack soir (repos days, for extra protein)
+  if(type==='off'){
+    meals.push({id:`${dayKey}-ev`,name:'Snack soir',time:'21h00',prot:15,cal:150,
+      foods:[{name:'Fromage blanc 0%',qty:'150g'},{name:'Graines de courge',qty:'15g'}],
+      supps:'Magnésium Taurine B6 — 2 gélules',timeRange:[20,22]});
+  }
+
+  return meals;
+}
+
+function renderMeals(){
+  const meals=getMealsForDay(selectedDayIndex);
+  const hour=new Date().getHours();
+  const todayIdx=new Date().getDay()===0?6:new Date().getDay()-1;
+  const isToday=selectedDayIndex===todayIdx;
+
+  let html='';
+  meals.forEach(m=>{
+    const done=state.checked[m.id]||false;
+    const isCurrent=isToday&&!done&&hour>=m.timeRange[0]&&hour<m.timeRange[1];
+    const cls=['meal-card',done?'done':'',isCurrent?'current':''].filter(Boolean).join(' ');
+
+    let foodsHtml=m.foods.map(f=>
+      `<div class="meal-food"><span>${f.name}</span><span class="food-qty">${f.qty}</span></div>`
     ).join('');
 
-    let suppsHtml = m.supps ? `<div class="meal-supps">${m.supps}</div>` : '';
+    let suppsHtml=m.supps?`<div class="meal-supps">${m.supps}</div>`:'';
+    let recipeHtml=m.recipe?`<div class="meal-recipe"><b>Recette express :</b> ${m.recipe}</div>`:'';
 
-    html += `
-      <div class="${classes}" id="card-${m.id}">
+    html+=`
+      <div class="${cls}" id="card-${m.id}">
         <div class="meal-header" onclick="toggleExpand('${m.id}')">
           <div class="meal-left">
             <div class="meal-check" onclick="event.stopPropagation();toggleMeal('${m.id}')">
@@ -673,186 +762,111 @@ function render(){
               <div class="meal-time">${m.time}</div>
             </div>
           </div>
-          <div class="meal-macros-badge">${m.prot}g prot</div>
+          <div class="meal-macros-badge">${m.prot}g</div>
         </div>
-        <div class="meal-details">
-          ${foodsHtml}
-          ${suppsHtml}
-        </div>
+        <div class="meal-details">${foodsHtml}${suppsHtml}${recipeHtml}</div>
       </div>`;
   });
-
-  document.getElementById('mealsList').innerHTML = html;
-  updateProgress();
+  document.getElementById('mealsList').innerHTML=html;
 }
 
-function toggleMeal(id){
-  state.checked[id] = !state.checked[id];
-  saveState();
-  render();
-}
+function toggleMeal(id){state.checked[id]=!state.checked[id];saveState();render()}
+function toggleExpand(id){document.getElementById('card-'+id).classList.toggle('expanded')}
 
-function toggleExpand(id){
-  const card = document.getElementById('card-'+id);
-  card.classList.toggle('expanded');
-}
-
-// ─── PROGRESS ────────────────────────────────────
 function updateProgress(){
-  const meals = MEALS[state.dayType];
-  let totalProt = 0, totalCal = 0, totalMeals = 0;
-  const targetProt = 180, targetCal = 2300;
+  const meals=getMealsForDay(selectedDayIndex);
+  let tp=0,tc=0,tm=0;
+  const TP=180,TC=2300;
+  meals.forEach(m=>{if(state.checked[m.id]){tp+=m.prot;tc+=m.cal;tm++}});
 
-  meals.forEach(m => {
-    if(state.checked[m.id]){
-      totalProt += m.prot;
-      totalCal += m.cal;
-      totalMeals++;
-    }
-  });
+  const pct=Math.min(tp/TP,1);
+  const circ=2*Math.PI*36;
+  document.getElementById('protRing').style.strokeDashoffset=circ*(1-pct);
+  document.getElementById('protValue').textContent=tp+'g';
 
-  // Ring
-  const pct = Math.min(totalProt / targetProt, 1);
-  const circumference = 2 * Math.PI * 38;
-  const offset = circumference * (1 - pct);
-  document.getElementById('protRing').style.strokeDashoffset = offset;
-  document.getElementById('protValue').textContent = totalProt + 'g';
+  const ring=document.getElementById('protRing');
+  ring.style.stroke=pct>=1?'var(--green)':pct>=.5?'var(--blue)':'var(--orange)';
 
-  // Color ring based on progress
-  const ring = document.getElementById('protRing');
-  if(pct >= 1) ring.style.stroke = 'var(--green)';
-  else if(pct >= 0.5) ring.style.stroke = 'var(--blue)';
-  else ring.style.stroke = 'var(--orange)';
-
-  // Bars
-  const protPct = Math.min(totalProt/targetProt*100, 100);
-  const calPct = Math.min(totalCal/targetCal*100, 100);
-  const mealPct = totalMeals/meals.length*100;
-
-  document.getElementById('barProt').style.width = protPct+'%';
-  document.getElementById('valProt').textContent = `${totalProt} / ${targetProt}g`;
-  document.getElementById('barCal').style.width = calPct+'%';
-  document.getElementById('valCal').textContent = `${totalCal} / ${targetCal}`;
-  document.getElementById('barMeals').style.width = mealPct+'%';
-  document.getElementById('valMeals').textContent = `${totalMeals} / ${meals.length}`;
+  document.getElementById('barProt').style.width=Math.min(tp/TP*100,100)+'%';
+  document.getElementById('valProt').textContent=`${tp} / ${TP}g`;
+  document.getElementById('barCal').style.width=Math.min(tc/TC*100,100)+'%';
+  document.getElementById('valCal').textContent=`${tc} / ${TC}`;
+  document.getElementById('barMeals').style.width=tm/meals.length*100+'%';
+  document.getElementById('valMeals').textContent=`${tm} / ${meals.length}`;
 }
 
-// ─── SHOPPING ────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SHOPPING
+// ═══════════════════════════════════════════════════════════════
 function renderShop(){
-  let html = '';
-  SHOPPING.forEach(section => {
-    html += `<div class="shop-section"><div class="shop-title">${section.section}</div>`;
-    section.items.forEach((item, i) => {
-      const key = section.section + '-' + i;
-      const bought = state.shopBought[key] || false;
-      html += `
+  let html='',totalPrice=0;
+  SHOPPING.forEach(section=>{
+    html+=`<div class="shop-section"><div class="shop-title">${section.section}</div>`;
+    section.items.forEach((item,i)=>{
+      const key=section.section+'-'+i;
+      const bought=state.shopBought[key]||false;
+      const priceNum=parseFloat((item.price||'').replace(/[^0-9.]/g,''))||0;
+      totalPrice+=priceNum;
+      html+=`
         <div class="shop-item ${bought?'bought':''}" onclick="toggleShopItem('${key}')">
           <div class="shop-check">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <span class="shop-name">${item.name}</span>
+          <span class="shop-name">${item.name}<br><span style="font-size:10px;color:var(--text3)">${item.usage}</span></span>
           <span class="shop-qty">${item.qty}</span>
           <span class="shop-price">${item.price}</span>
         </div>`;
     });
-    html += '</div>';
+    html+='</div>';
   });
-  document.getElementById('shopList').innerHTML = html;
+  document.getElementById('shopList').innerHTML=html;
+  document.getElementById('shopTotal').innerHTML=`Budget semaine : <span>~${Math.round(totalPrice)}€</span> / 122€ dispo`;
 }
 
-function toggleShopItem(key){
-  state.shopBought[key] = !state.shopBought[key];
-  saveState();
-  renderShop();
-}
+function toggleShopItem(key){state.shopBought[key]=!state.shopBought[key];saveState();renderShop()}
+function resetShop(){state.shopBought={};saveState();renderShop()}
 
-function resetShop(){
-  state.shopBought = {};
-  saveState();
-  renderShop();
-}
-
-// ─── SWAPS ───────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SWAPS
+// ═══════════════════════════════════════════════════════════════
 function renderSwaps(){
-  let html = '';
-  let currentCat = '';
-  SWAPS.forEach(s => {
-    if(s.cat !== currentCat){
-      currentCat = s.cat;
-      html += `<div class="swap-title">${s.cat}</div>`;
-    }
-    html += `
-      <div class="swap-row">
-        <span class="swap-from">${s.from}</span>
-        <span class="swap-arrow">→</span>
-        <span class="swap-to">${s.to}</span>
-      </div>`;
+  let html='',cat='';
+  SWAPS.forEach(s=>{
+    if(s.cat!==cat){cat=s.cat;html+=`<div class="swap-title">${s.cat}</div>`}
+    html+=`<div class="swap-row"><span class="swap-from">${s.from}</span><span class="swap-arrow">→</span><span class="swap-to">${s.to}</span></div>`;
   });
-  document.getElementById('swapList').innerHTML = html;
+  document.getElementById('swapList').innerHTML=html;
 }
 
-// ─── RESET ───────────────────────────────────────
-function resetAll(){
-  if(confirm('Réinitialiser toutes les données ?')){
-    localStorage.removeItem('nutritrack');
-    state = {date:TODAY, dayType:'on', checked:{}, shopBought:{}};
-    render();
-    renderShop();
-  }
-}
-
-// ─── LOCK SCREEN ─────────────────────────────────
-const PIN_CODE = '2580';
-let pinInput = '';
-
-function checkUnlocked(){
-  const ts = localStorage.getItem('nutritrack_unlock');
-  if(!ts) return false;
-  return (Date.now() - parseInt(ts)) < 12*60*60*1000;
-}
-
-function unlock(){
-  localStorage.setItem('nutritrack_unlock', Date.now().toString());
-  document.getElementById('lockScreen').classList.add('hidden');
-}
-
+// ═══════════════════════════════════════════════════════════════
+// LOCK
+// ═══════════════════════════════════════════════════════════════
+const PIN_CODE='2580';
+let pinInput='';
+function checkUnlocked(){const ts=localStorage.getItem('nt2_u');if(!ts)return false;return(Date.now()-parseInt(ts))<12*3600000}
+function unlock(){localStorage.setItem('nt2_u',Date.now().toString());document.getElementById('lockScreen').classList.add('hidden')}
 function pinPress(n){
-  if(pinInput.length >= 4) return;
-  pinInput += n;
-  updateDots();
-  if(pinInput.length === 4){
-    if(pinInput === PIN_CODE){
-      setTimeout(()=>{ unlock(); pinInput=''; updateDots(); }, 200);
-    } else {
+  if(pinInput.length>=4)return;pinInput+=n;updateDots();
+  if(pinInput.length===4){
+    if(pinInput===PIN_CODE){setTimeout(()=>{unlock();pinInput='';updateDots()},200)}
+    else{
       document.querySelectorAll('.lock-dot').forEach(d=>d.classList.add('error'));
-      document.getElementById('lockError').textContent = 'Code incorrect';
-      setTimeout(()=>{
-        pinInput='';
-        updateDots();
+      document.getElementById('lockError').textContent='Code incorrect';
+      setTimeout(()=>{pinInput='';updateDots();
         document.querySelectorAll('.lock-dot').forEach(d=>d.classList.remove('error'));
-        document.getElementById('lockError').textContent = '';
-      }, 800);
+        document.getElementById('lockError').textContent=''},800);
     }
   }
 }
+function pinBack(){pinInput=pinInput.slice(0,-1);updateDots()}
+function updateDots(){document.querySelectorAll('.lock-dot').forEach((d,i)=>{d.classList.toggle('filled',i<pinInput.length);d.classList.remove('error')})}
 
-function pinBack(){
-  pinInput = pinInput.slice(0,-1);
-  updateDots();
-}
+function resetAll(){if(confirm('Réinitialiser ?')){localStorage.removeItem('nt2');localStorage.removeItem('nt2_u');location.reload()}}
 
-function updateDots(){
-  const dots = document.querySelectorAll('.lock-dot');
-  dots.forEach((d,i)=>{
-    d.classList.toggle('filled', i < pinInput.length);
-    d.classList.remove('error');
-  });
-}
-
-// ─── INIT ────────────────────────────────────────
-if(checkUnlocked()){
-  document.getElementById('lockScreen').classList.add('hidden');
-}
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+if(checkUnlocked())document.getElementById('lockScreen').classList.add('hidden');
 render();
 renderShop();
 renderSwaps();
