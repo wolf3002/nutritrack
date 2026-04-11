@@ -371,8 +371,32 @@ textarea.journal-input{min-height:100px;resize:vertical;font-family:inherit}
 <div id="page-shop" class="page">
   <div class="header">
     <h1>Courses — Semaine <span id="shopWeek"></span>/4</h1>
-    <div class="subtitle">Par magasin, dans l'ordre de tes arrêts</div>
+    <div class="subtitle">Samedi — Par magasin, dans l'ordre de tes arrêts</div>
   </div>
+
+  <!-- CHECKLIST QUALITÉ -->
+  <div style="background:var(--orange-dim);border-radius:var(--radius);padding:12px;margin-bottom:14px;border-left:3px solid var(--orange)">
+    <div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:6px">Checklist qualité en magasin</div>
+    <div style="font-size:10px;color:var(--text2);line-height:1.6">
+      <b>1.</b> Liste d'ingrédients : max 5, noms reconnaissables<br>
+      <b>2.</b> Origine : "Origine France" (pas juste "Élaboré en")<br>
+      <b>3.</b> Oeufs : code <b>0</b> (bio) ou <b>1</b> (plein air) sur la coquille<br>
+      <b>4.</b> Dirty Dozen = BIO obligatoire : pommes, fraises, épinards, raisin, poivrons, tomates, brocolis<br>
+      <b>5.</b> Emballage : verre > inox > plastique. Conserve acide (tomates) = éviter<br>
+      <b>6.</b> Pas de : huile de palme, E250/252 (nitrites), E621 (glutamate), sucre dans les 3 premiers ingrédients
+    </div>
+  </div>
+
+  <!-- RAPPEL MEAL PREP -->
+  <div style="background:var(--green-bg);border-radius:var(--radius);padding:12px;margin-bottom:14px;border-left:3px solid var(--green)">
+    <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">Meal prep dimanche</div>
+    <div style="font-size:10px;color:var(--text2);line-height:1.6">
+      Préparer Lun-Jeu en batch (~90 min). Vendredi = poisson froid, pas de cuisson.<br>
+      Conservation : viande cuite <b>4 jours max</b> au frigo, boîtes en verre.<br>
+      Lavage légumes : trempage 10-15 min eau froide + bicarbonate de soude, rincer, peler si non-bio.
+    </div>
+  </div>
+
   <div id="shopList"></div>
   <div class="shop-total" id="shopTotal"></div>
   <button class="reset-btn" onclick="resetShop()" style="margin-top:10px">Réinitialiser la liste</button>
