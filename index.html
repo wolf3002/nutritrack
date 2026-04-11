@@ -402,12 +402,42 @@ textarea.journal-input{min-height:100px;resize:vertical;font-family:inherit}
   <button class="reset-btn" onclick="resetShop()" style="margin-top:10px">Réinitialiser la liste</button>
 </div>
 
-<!-- ═══════════ PAGE SWAPS ═══════════ -->
-<div id="page-swap" class="page">
+<!-- ═══════════ PAGE PREP ═══════════ -->
+<div id="page-prep" class="page">
   <div class="header">
-    <h1>Alternatives</h1>
-    <div class="subtitle">Échange un aliment quand tu en as marre</div>
+    <h1>Meal Prep — Dimanche</h1>
+    <div class="subtitle">Semaine <span id="prepWeek"></span>/4 — ~90 min de préparation</div>
   </div>
+
+  <!-- ÉTAPES BATCH COOKING -->
+  <div style="background:var(--green-bg);border-radius:var(--radius);padding:12px;margin-bottom:14px;border-left:3px solid var(--green)">
+    <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">Ordre de préparation</div>
+    <div style="font-size:10px;color:var(--text2);line-height:1.8">
+      <b>1.</b> Laver tous les légumes (bicarbonate 10 min + rincer + peler si non-bio)<br>
+      <b>2.</b> Lancer le four à 200°C<br>
+      <b>3.</b> Mettre les féculents à cuire (riz 12 min, lentilles 25 min, quinoa 15 min, patate douce au four 25 min)<br>
+      <b>4.</b> Pendant que ça cuit : couper les légumes + préparer les viandes<br>
+      <b>5.</b> Enfourner le poulet + patate douce ensemble (25 min)<br>
+      <b>6.</b> Poêler les viandes non-four (rumsteck, bavette, onglet = 3 min/face)<br>
+      <b>7.</b> Cuire les légumes (vapeur 8-10 min ou poêle 5 min)<br>
+      <b>8.</b> Oeufs durs : 10 min dans l'eau bouillante<br>
+      <b>9.</b> Assembler dans les 5 boîtes en verre. Laisser refroidir avant de fermer.<br>
+      <b>10.</b> Vendredi = poisson froid (maquereau/sardines bocal) → PAS de cuisson, assembler le matin.
+    </div>
+  </div>
+
+  <!-- CONSERVATION -->
+  <div style="background:var(--orange-dim);border-radius:var(--radius);padding:12px;margin-bottom:14px;border-left:3px solid var(--orange)">
+    <div style="font-size:10px;color:var(--text2);line-height:1.6">
+      <b>Conservation :</b> Viande cuite = <b>4 jours max</b> au frigo. Préparer Lun-Jeu le dimanche. Vendredi = poisson froid assemblé le matin ou congelé dimanche et décongelé jeudi soir.
+    </div>
+  </div>
+
+  <!-- 5 RECETTES DE LA SEMAINE PROCHAINE -->
+  <div id="prepRecipes"></div>
+
+  <!-- SWAPS -->
+  <div class="section-title" style="margin-top:16px">Alternatives (si un ingrédient manque)</div>
   <div id="swapList"></div>
 </div>
 
@@ -515,9 +545,9 @@ textarea.journal-input{min-height:100px;resize:vertical;font-family:inherit}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
     <span>Courses</span>
   </button>
-  <button class="nav-btn" onclick="showPage('page-swap',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
-    <span>Swaps</span>
+  <button class="nav-btn" onclick="showPage('page-prep',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+    <span>Prep</span>
   </button>
   <button class="nav-btn" onclick="showPage('page-profile',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1073,6 +1103,54 @@ function toggleShopItem(key){state.shopBought[key]=!state.shopBought[key];saveSt
 function resetShop(){state.shopBought={};saveState();renderShop()}
 
 // ═══════════════════════════════════════════════════════════════
+// PREP — Recettes de la semaine prochaine
+// ═══════════════════════════════════════════════════════════════
+function renderPrep(){
+  const nextWeek = getNextWeekIndex();
+  document.getElementById('prepWeek').textContent = nextWeek + 1;
+
+  const dayNames = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
+  const startIdx = nextWeek * 5;
+  let html = '';
+
+  for(let i = 0; i < 5; i++){
+    const mp = MEAL_PREPS[startIdx + i];
+    if(!mp) continue;
+    const isCold = mp.recipe && mp.recipe.includes('FROID');
+
+    let foodsHtml = mp.foods.map(f =>
+      `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;color:var(--text2);border-bottom:1px solid var(--bg3)">
+        <span>${f.n}</span><span style="color:var(--text3);text-align:right">${f.q}</span>
+      </div>`
+    ).join('');
+
+    html += `
+      <div style="background:var(--bg2);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;border-left:3px solid ${isCold?'var(--blue)':'var(--green)'};box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div style="padding:12px 14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div>
+              <div style="font-size:10px;font-weight:600;color:${isCold?'var(--blue)':'var(--green)'}">
+                ${dayNames[i]} ${isCold?'— FROID (pas de réchauffage)':''}
+              </div>
+              <div style="font-size:13px;font-weight:700;margin-top:2px">${mp.name}</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-dim);padding:4px 8px;border-radius:20px">
+              ${mp.prot}g prot
+            </div>
+          </div>
+          ${foodsHtml}
+          ${mp.recipe ? `<div style="margin-top:8px;padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm);font-size:10px;color:var(--text2);border:1px solid var(--bg3)">
+            <b style="color:var(--text)">Recette :</b> ${mp.recipe}
+          </div>` : ''}
+          <div style="font-size:10px;color:var(--text3);margin-top:6px">${mp.cal} kcal</div>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('prepRecipes').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // SWAPS
 // ═══════════════════════════════════════════════════════════════
 function renderSwaps(){
@@ -1301,6 +1379,7 @@ function drawWeightChart(data){
 if(checkUnlocked())document.getElementById('lockScreen').classList.add('hidden');
 render();
 renderShop();
+renderPrep();
 renderSwaps();
 renderJournal();
 </script>
