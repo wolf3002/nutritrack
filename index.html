@@ -371,7 +371,7 @@ textarea.journal-input{min-height:100px;resize:vertical;font-family:inherit}
 <div id="page-shop" class="page">
   <div class="header">
     <h1>Courses — Semaine <span id="shopWeek"></span>/4</h1>
-    <div class="subtitle">Samedi — Par magasin, dans l'ordre de tes arrêts</div>
+    <div class="subtitle">Courses samedi pour la semaine prochaine</div>
   </div>
 
   <!-- CHECKLIST QUALITÉ -->
@@ -638,9 +638,11 @@ function getCurrentWeekIndex(){
 
 // ═══════════════════════════════════════════════════════════════
 // COURSES PAR MAGASIN
+// Courses samedi = pour la semaine SUIVANTE (meal prep dimanche → lun-ven)
 // ═══════════════════════════════════════════════════════════════
+function getNextWeekIndex(){ return (CURRENT_WEEK + 1) % 4; }
 function getStoresShopping(){
-  const w = CURRENT_WEEK;
+  const w = getNextWeekIndex();
 
   // Boucherie varie par semaine
   const boucherieItems = [];
@@ -1063,7 +1065,7 @@ function renderShop(){
     html+='</div>';
   });
   document.getElementById('shopList').innerHTML=html;
-  document.getElementById('shopWeek').textContent=CURRENT_WEEK+1;
+  document.getElementById('shopWeek').textContent=getNextWeekIndex()+1;
   document.getElementById('shopTotal').innerHTML=`Budget courses : <span>~${Math.round(totalPrice)}€ / semaine</span>`;
 }
 
