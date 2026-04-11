@@ -454,6 +454,18 @@ textarea.journal-input{min-height:100px;resize:vertical;font-family:inherit}
     <textarea class="journal-input" id="noteInput" placeholder="Comment tu te sens aujourd'hui ?"></textarea>
   </div>
 
+  <div class="journal-input-group">
+    <label class="journal-label">Avis sur le meal prep du jour (pour amélioration)</label>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <button class="lock-key" style="width:44px;height:44px;font-size:18px;border-radius:10px;background:var(--bg2);border:1px solid var(--bg3);color:var(--text3)" onclick="setMealRating(1)">1</button>
+      <button class="lock-key" style="width:44px;height:44px;font-size:18px;border-radius:10px;background:var(--bg2);border:1px solid var(--bg3);color:var(--text3)" onclick="setMealRating(2)">2</button>
+      <button class="lock-key" style="width:44px;height:44px;font-size:18px;border-radius:10px;background:var(--bg2);border:1px solid var(--bg3);color:var(--text3)" onclick="setMealRating(3)">3</button>
+      <button class="lock-key" style="width:44px;height:44px;font-size:18px;border-radius:10px;background:var(--bg2);border:1px solid var(--bg3);color:var(--text3)" onclick="setMealRating(4)">4</button>
+      <button class="lock-key" style="width:44px;height:44px;font-size:18px;border-radius:10px;background:var(--bg2);border:1px solid var(--bg3);color:var(--text3)" onclick="setMealRating(5)">5</button>
+    </div>
+    <textarea class="journal-input" id="mealFeedback" placeholder="Goût, texture, satiété, ce que tu changerais..." style="min-height:60px"></textarea>
+  </div>
+
   <button class="journal-save-btn" onclick="saveJournal()">Sauvegarder</button>
 
   <div class="section-title" style="margin-top:20px">Courbe de poids (30 derniers jours)</div>
@@ -496,13 +508,100 @@ textarea.journal-input{min-height:100px;resize:vertical;font-family:inherit}
 
 const SUPPS_MATIN = 'Quercétine/Bromélaïne 2 gél. + Créatine 5g + D3K2 + Magnésium (AVEC le repas gras)';
 
-// 5 Meal Preps en rotation (Lun=0..Ven=4)
+// 20 Meal Preps — 4 semaines x 5 jours (Lun=0..Ven=4)
+// Rotation protéines : Lun=Poulet, Mar=Viande rouge, Mer=Oeufs+légumineuses, Jeu=Poulet/Dinde, Ven=Poisson froid
 const MEAL_PREPS = [
-  {name:'Poulet + riz basmati + brocolis',foods:[{n:'Filet de poulet (Hecquet)',q:'200g'},{n:'Riz basmati',q:'120g cru'},{n:'Brocolis',q:'200g'},{n:'Huile olive AOP',q:'10ml'},{n:'Curcuma + poivre',q:''}],prot:50,cal:750,recipe:'Poulet au four 200°C 25min. Riz basmati 12min. Brocolis vapeur 8min. Assembler dans boîte en verre.'},
-  {name:'Poulet + lentilles vertes + carottes',foods:[{n:'Filet de poulet (Hecquet)',q:'200g'},{n:'Lentilles vertes France',q:'100g cru'},{n:'Carottes',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Paprika fumé + ail',q:''}],prot:52,cal:720,recipe:'Lentilles 25min. Poulet saisi 5min/face. Carottes en rondelles poêlées 8min.'},
-  {name:'Maquereau + riz basmati + courgettes',foods:[{n:'Maquereau (Phare d\'Eckmühl, bocal verre)',q:'200g'},{n:'Riz basmati',q:'120g cru'},{n:'Courgettes',q:'200g'},{n:'Citron + herbes de Provence',q:''}],prot:45,cal:700,recipe:'Riz 12min. Courgettes en rondelles poêlées 5min. Maquereau égoutté par-dessus. Citron.'},
-  {name:'Poulet + patate douce + haricots verts',foods:[{n:'Filet de poulet (Hecquet)',q:'200g'},{n:'Patate douce',q:'250g'},{n:'Haricots verts',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Moutarde à l\'ancienne',q:'1 cs'}],prot:48,cal:750,recipe:'Patate douce + poulet au four 200°C 25min ensemble. Haricots verts vapeur 10min.'},
-  {name:'Oeufs + lentilles + brocolis + poivron',foods:[{n:'Oeufs bio code 0',q:'4'},{n:'Lentilles vertes',q:'50g cru'},{n:'Brocolis',q:'200g'},{n:'Poivron bio',q:'1'},{n:'Huile olive + sauce soja',q:''}],prot:42,cal:680,recipe:'Lentilles 25min. Oeufs durs 10min. Brocolis + poivron sautés 5min. Sauce soja.'},
+  // ── SEMAINE 1 ──
+  {name:'Poulet curry + riz basmati + brocolis (Boucherie Hecquet)',
+   foods:[{n:'Filet de poulet (Boucherie Hecquet)',q:'200g'},{n:'Riz basmati',q:'120g cru'},{n:'Brocolis bio',q:'200g'},{n:'Huile olive AOP',q:'10ml'},{n:'Curcuma + poivre noir',q:''}],
+   prot:50,cal:750,recipe:'Poulet saisi 5min/face puis four 200°C 15min avec curcuma+poivre. Riz basmati 12min. Brocolis vapeur 8min. Assembler dans boîte en verre.'},
+
+  {name:'Rumsteck + lentilles vertes + carottes (Boucherie Hecquet)',
+   foods:[{n:'Rumsteck (Boucherie Hecquet)',q:'200g'},{n:'Lentilles vertes France',q:'100g cru'},{n:'Carottes',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Paprika fumé',q:''}],
+   prot:52,cal:740,recipe:'Lentilles 25min. Rumsteck saisi 3min/face (saignant-à point). Carottes en rondelles poêlées 8min avec paprika fumé.'},
+
+  {name:'Oeufs + pois chiches + épinards + poivron',
+   foods:[{n:'Oeufs bio code 0',q:'4'},{n:'Pois chiches',q:'150g cuit'},{n:'Épinards bio',q:'200g'},{n:'Poivron bio',q:'1'},{n:'Huile olive',q:'10ml'},{n:'Cumin + jus de citron',q:''}],
+   prot:42,cal:680,recipe:'Oeufs durs 10min. Poêler épinards + poivron émincé 5min. Ajouter pois chiches, cumin, filet citron. Oeufs coupés par-dessus.'},
+
+  {name:'Dinde + patate douce + haricots verts (Boucherie Hecquet)',
+   foods:[{n:'Escalope de dinde (Boucherie Hecquet)',q:'200g'},{n:'Patate douce',q:'250g'},{n:'Haricots verts',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Moutarde à l\'ancienne',q:'1 cs'}],
+   prot:48,cal:730,recipe:'Patate douce + dinde au four 200°C 25min ensemble. Haricots verts vapeur 10min. Napper dinde de moutarde ancienne.'},
+
+  {name:'Maquereau + riz basmati + salade composée (FROID)',
+   foods:[{n:'Maquereau (Phare d\'Eckmühl, bocal verre)',q:'200g'},{n:'Riz basmati',q:'120g cru'},{n:'Salade verte',q:'100g'},{n:'Tomates',q:'100g'},{n:'Citron + herbes fraîches',q:''}],
+   prot:45,cal:700,recipe:'Riz basmati cuit la veille, refroidi. Émietter maquereau sur lit de salade + tomates. Vinaigrette citron + herbes. PAS DE RÉCHAUFFAGE.'},
+
+  // ── SEMAINE 2 ──
+  {name:'Poulet + boulgour + courgettes (Boucherie Hecquet)',
+   foods:[{n:'Filet de poulet (Boucherie Hecquet)',q:'200g'},{n:'Boulgour',q:'120g cru'},{n:'Courgettes',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Herbes de Provence',q:''}],
+   prot:50,cal:720,recipe:'Poulet saisi 5min/face avec herbes de Provence. Boulgour 10min. Courgettes en dés poêlées 5min.'},
+
+  {name:'Bavette d\'aloyau + quinoa + champignons (Boucherie Hecquet)',
+   foods:[{n:'Bavette d\'aloyau (Boucherie Hecquet)',q:'200g'},{n:'Quinoa',q:'120g cru'},{n:'Champignons',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Sauce soja + ail',q:''}],
+   prot:50,cal:750,recipe:'Quinoa 15min. Champignons poêlés 5min avec ail. Bavette saisie 2-3min/face. Déglacer sauce soja.'},
+
+  {name:'Oeufs + lentilles corail + brocolis curry',
+   foods:[{n:'Oeufs bio code 0',q:'4'},{n:'Lentilles corail',q:'100g cru'},{n:'Brocolis bio',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Curry + lait de coco',q:'30ml'}],
+   prot:44,cal:700,recipe:'Lentilles corail 15min avec curry + lait coco 30ml. Oeufs brouillés ou durs. Brocolis vapeur 8min. Assembler.'},
+
+  {name:'Poulet + riz basmati + poivrons (Boucherie Hecquet)',
+   foods:[{n:'Filet de poulet (Boucherie Hecquet)',q:'200g'},{n:'Riz basmati',q:'120g cru'},{n:'Poivrons bio',q:'2'},{n:'Huile olive',q:'10ml'},{n:'Paprika + oignon',q:''}],
+   prot:50,cal:740,recipe:'Poulet émincé saisi 5min avec paprika. Poivrons + oignon poêlés 6min. Riz basmati 12min. Assembler.'},
+
+  {name:'Sardines + quinoa + salade composée (FROID)',
+   foods:[{n:'Sardines (Phare d\'Eckmühl, bocal verre)',q:'200g'},{n:'Quinoa',q:'120g cru'},{n:'Tomates',q:'100g'},{n:'Concombre',q:'100g'},{n:'Huile olive + citron',q:'vinaigrette'}],
+   prot:42,cal:680,recipe:'Quinoa cuit la veille, refroidi. Tomates + concombre en dés. Sardines égouttées par-dessus. Vinaigrette olive citron. PAS DE RÉCHAUFFAGE.'},
+
+  // ── SEMAINE 3 ──
+  {name:'Poulet curry + lentilles vertes + courgettes (Boucherie Hecquet)',
+   foods:[{n:'Filet de poulet (Boucherie Hecquet)',q:'200g'},{n:'Lentilles vertes France',q:'100g cru'},{n:'Courgettes',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Curry + curcuma',q:''}],
+   prot:52,cal:740,recipe:'Lentilles 25min. Poulet émincé saisi 5min avec curry + curcuma. Courgettes poêlées 5min. Assembler.'},
+
+  {name:'Onglet de boeuf + patate douce + brocolis (Boucherie Hecquet)',
+   foods:[{n:'Onglet de boeuf (Boucherie Hecquet)',q:'200g'},{n:'Patate douce',q:'250g'},{n:'Brocolis bio',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Moutarde + miel',q:'1cc miel'}],
+   prot:50,cal:750,recipe:'Patate douce au four 200°C 25min. Onglet saisi 3min/face. Brocolis vapeur 8min. Sauce moutarde + 1cc miel.'},
+
+  {name:'Omelette + haricots rouges + poivron + oignon',
+   foods:[{n:'Oeufs bio code 0',q:'4'},{n:'Haricots rouges',q:'150g cuit'},{n:'Poivron bio',q:'1'},{n:'Oignon',q:'1'},{n:'Huile olive',q:'10ml'},{n:'Paprika fumé',q:''}],
+   prot:44,cal:710,recipe:'Omelette 4 oeufs avec poivron + oignon émincés. Haricots rouges réchauffés avec paprika fumé à côté.'},
+
+  {name:'Dinde + boulgour + carottes (Boucherie Hecquet)',
+   foods:[{n:'Escalope de dinde (Boucherie Hecquet)',q:'200g'},{n:'Boulgour',q:'120g cru'},{n:'Carottes',q:'200g'},{n:'Oignon',q:'1'},{n:'Huile olive',q:'10ml'},{n:'Curcuma + gingembre',q:''}],
+   prot:48,cal:720,recipe:'Boulgour 10min. Dinde saisie 5min/face avec curcuma+gingembre. Carottes + oignon poêlés 8min.'},
+
+  {name:'Maquereau + lentilles vertes + betterave (FROID)',
+   foods:[{n:'Maquereau (Phare d\'Eckmühl, bocal verre)',q:'200g'},{n:'Lentilles vertes',q:'100g cru'},{n:'Betterave cuite',q:'150g'},{n:'Salade verte',q:'50g'},{n:'Moutarde + huile olive',q:'vinaigrette'}],
+   prot:44,cal:690,recipe:'Lentilles cuites la veille, refroidies. Betterave en dés. Maquereau émietté. Vinaigrette moutarde olive. PAS DE RÉCHAUFFAGE.'},
+
+  // ── SEMAINE 4 ──
+  {name:'Poulet + riz basmati + haricots verts (Boucherie Hecquet)',
+   foods:[{n:'Filet de poulet (Boucherie Hecquet)',q:'200g'},{n:'Riz basmati',q:'120g cru'},{n:'Haricots verts',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Ail + persil',q:''}],
+   prot:50,cal:740,recipe:'Poulet saisi 5min/face avec ail + persil. Riz basmati 12min. Haricots verts vapeur 10min.'},
+
+  {name:'Filet mignon porc + quinoa + champignons + épinards (Boucherie Hecquet)',
+   foods:[{n:'Filet mignon de porc (Boucherie Hecquet)',q:'200g'},{n:'Quinoa',q:'120g cru'},{n:'Champignons',q:'150g'},{n:'Épinards bio',q:'200g'},{n:'Crème fraîche',q:'1 cs'}],
+   prot:48,cal:730,recipe:'Quinoa 15min. Filet mignon tranché, saisi 4min/face. Champignons + épinards poêlés 5min. 1cs crème fraîche en finition.'},
+
+  {name:'Oeufs + pois chiches + aubergine + tomates',
+   foods:[{n:'Oeufs bio code 0',q:'4'},{n:'Pois chiches',q:'150g cuit'},{n:'Aubergine',q:'200g'},{n:'Tomates',q:'100g'},{n:'Huile olive',q:'10ml'},{n:'Herbes de Provence',q:''}],
+   prot:42,cal:690,recipe:'Aubergine en dés poêlée 8min. Ajouter pois chiches + tomates 5min. Oeufs durs ou au plat. Herbes de Provence.'},
+
+  {name:'Poulet + patate douce + brocolis sésame (Boucherie Hecquet)',
+   foods:[{n:'Filet de poulet (Boucherie Hecquet)',q:'200g'},{n:'Patate douce',q:'250g'},{n:'Brocolis bio',q:'200g'},{n:'Huile olive',q:'10ml'},{n:'Sauce soja + sésame',q:''}],
+   prot:50,cal:750,recipe:'Patate douce au four 200°C 25min. Poulet saisi 5min/face. Brocolis vapeur 8min. Sauce soja + graines de sésame.'},
+
+  {name:'Sardines + boulgour + concombre + poivron (FROID)',
+   foods:[{n:'Sardines (Phare d\'Eckmühl, bocal verre)',q:'200g'},{n:'Boulgour',q:'120g cru'},{n:'Concombre',q:'150g'},{n:'Poivron bio',q:'1'},{n:'Tahini + citron',q:'sauce'}],
+   prot:43,cal:700,recipe:'Boulgour cuit la veille, refroidi. Concombre + poivron en dés. Sardines égouttées. Sauce tahini + citron. PAS DE RÉCHAUFFAGE.'},
+];
+
+// Mapping semaine → indices meal preps (5 preps par semaine)
+const WEEK_PLANS = [
+  [0,1,2,3,4],     // Semaine 1
+  [5,6,7,8,9],     // Semaine 2
+  [10,11,12,13,14], // Semaine 3
+  [15,16,17,18,19], // Semaine 4
 ];
 
 // Quelle semaine sommes-nous ? (basé sur le numéro de semaine de l'année, modulo 4)
@@ -517,44 +616,80 @@ function getCurrentWeekIndex(){
 // COURSES PAR MAGASIN
 // ═══════════════════════════════════════════════════════════════
 function getStoresShopping(){
+  const w = CURRENT_WEEK;
+
+  // Boucherie varie par semaine
+  const boucherieItems = [];
+  if(w===0){
+    boucherieItems.push({name:'Filets de poulet fermier',qty:'400g',price:'~6€',usage:'Meal prep Lun+Jeu',check:'CRU brut, 1 ingrédient, pas pré-mariné'});
+    boucherieItems.push({name:'Rumsteck',qty:'200g',price:'~6€',usage:'Meal prep Mar',check:'Viande rouge max 1x/sem'});
+    boucherieItems.push({name:'Escalope de dinde',qty:'200g',price:'~4€',usage:'Meal prep Jeu',check:''});
+  } else if(w===1){
+    boucherieItems.push({name:'Filets de poulet fermier',qty:'400g',price:'~6€',usage:'Meal prep Lun+Jeu',check:'CRU brut, 1 ingrédient, pas pré-mariné'});
+    boucherieItems.push({name:'Bavette d\'aloyau',qty:'200g',price:'~6€',usage:'Meal prep Mar',check:'Viande rouge max 1x/sem'});
+  } else if(w===2){
+    boucherieItems.push({name:'Filets de poulet fermier',qty:'400g',price:'~6€',usage:'Meal prep Lun+Jeu (curry)',check:'CRU brut, 1 ingrédient, pas pré-mariné'});
+    boucherieItems.push({name:'Onglet de boeuf',qty:'200g',price:'~6€',usage:'Meal prep Mar',check:'Viande rouge max 1x/sem'});
+    boucherieItems.push({name:'Escalope de dinde',qty:'200g',price:'~4€',usage:'Meal prep Jeu',check:''});
+  } else {
+    boucherieItems.push({name:'Filets de poulet fermier',qty:'400g',price:'~6€',usage:'Meal prep Lun+Jeu',check:'CRU brut, 1 ingrédient, pas pré-mariné'});
+    boucherieItems.push({name:'Filet mignon de porc',qty:'200g',price:'~5€',usage:'Meal prep Mar',check:''});
+  }
+
+  // Biocoop varie par semaine
+  const biocoopItems = [
+    {name:'Brocolis bio',qty:'300g',price:'~2.50€',usage:'Meal prep',check:'DIRTY DOZEN — obligatoire en bio'},
+    {name:'Pommes bio',qty:'1kg',price:'~3€',usage:'Dernière prise quotidienne',check:'N°1 le plus contaminé — TOUJOURS bio'},
+  ];
+  if(w===0){
+    biocoopItems.push({name:'Épinards bio',qty:'200g',price:'~2.50€',usage:'Meal prep Mer',check:'DIRTY DOZEN — bio obligatoire'});
+    biocoopItems.push({name:'Poivrons bio',qty:'2',price:'~2€',usage:'Meal prep Mer',check:'DIRTY DOZEN — bio obligatoire'});
+  } else if(w===1){
+    biocoopItems.push({name:'Poivrons bio',qty:'2',price:'~2€',usage:'Meal prep Jeu',check:'DIRTY DOZEN — bio obligatoire'});
+  } else if(w===2){
+    biocoopItems.push({name:'Poivrons bio',qty:'2',price:'~2€',usage:'Meal prep Mer+Ven',check:'DIRTY DOZEN — bio obligatoire'});
+  } else {
+    biocoopItems.push({name:'Épinards bio',qty:'200g',price:'~2.50€',usage:'Meal prep Mar',check:'DIRTY DOZEN — bio obligatoire'});
+    biocoopItems.push({name:'Poivrons bio',qty:'1',price:'~1€',usage:'Meal prep Ven',check:'DIRTY DOZEN — bio obligatoire'});
+  }
+  biocoopItems.push({name:'Huile olive AOP vierge extra (VERRE)',qty:'500ml',price:'~10€',usage:'Cuisson + assaisonnement',check:'AOP Nyons/Provence. Bouteille VERRE obligatoire'});
+  biocoopItems.push({name:'Maquereau/Sardines Phare d\'Eckmühl bocal verre',qty:'x4',price:'~8€',usage:'Meal prep Ven (FROID)',check:'Petit poisson = peu de mercure. BOCAL VERRE'});
+
   return [
     {section:'BOUCHERIE HECQUET — Cinqueux',
-     note:'100% France | Volaille fermière | Meal prep Lun+Mar+Jeu',
-     items:[
-      {name:'Filets de poulet fermier',qty:'800g',price:'~14€',usage:'Meal prep Lun+Mar+Jeu',check:'CRU brut, 1 ingrédient, pas pré-mariné'},
-     ]
+     note:'100% France | Volaille fermière | Viande rouge max 1x/sem',
+     items:boucherieItems
     },
     {section:'LIDL — rue Pasteur, Pont-Ste-Maxence',
      note:'Oeufs bio + flocons + yaourt + basiques',
      items:[
-      {name:'Oeufs bio code 0',qty:'1x12',price:'~4€',usage:'Petit-déj + meal prep ven',check:'CODE 0 sur l\'oeuf'},
+      {name:'Oeufs bio code 0',qty:'1x12',price:'~4€',usage:'Petit-déj + meal prep Mer',check:'CODE 0 sur l\'oeuf'},
       {name:'Flocons avoine BIO',qty:'500g',price:'~2€',usage:'Petit-déj quotidien',check:'BIO pour éviter glyphosate'},
       {name:'Yaourt grec nature',qty:'x4',price:'~3€',usage:'Collation bureau',check:'Ingrédients = lait + ferments. RIEN d\'autre'},
       {name:'Amandes nature',qty:'200g',price:'~3€',usage:'Petit-déj + dernière prise',check:'Nature, non grillées, non salées'},
       {name:'Bananes',qty:'1kg',price:'~1.50€',usage:'Petit-déj bureau',check:'Peau épaisse = peu de pesticides'},
-      {name:'Haricots verts surgelés',qty:'1kg',price:'~2€',usage:'Meal prep jeu',check:'Surgelés = blanchis, moins de résidus'},
+      {name:'Haricots verts surgelés',qty:'1kg',price:'~2€',usage:'Meal prep',check:'Surgelés = blanchis, moins de résidus'},
      ]
     },
     {section:'BIOCOOP — Creil ou Senlis',
      note:'DIRTY DOZEN en bio obligatoire | Bocal verre',
-     items:[
-      {name:'Brocolis bio',qty:'500g',price:'~3€',usage:'Meal prep lun+ven',check:'DIRTY DOZEN — obligatoire en bio'},
-      {name:'Pommes bio',qty:'1kg',price:'~3€',usage:'Dernière prise quotidienne',check:'N°1 le plus contaminé — TOUJOURS bio'},
-      {name:'Poivrons bio',qty:'3',price:'~3€',usage:'Meal prep ven',check:'DIRTY DOZEN — bio obligatoire'},
-      {name:'Huile olive AOP vierge extra (VERRE)',qty:'500ml',price:'~10€',usage:'Cuisson + assaisonnement',check:'AOP Nyons/Provence. Bouteille VERRE obligatoire'},
-      {name:'Maquereau Phare d\'Eckmühl bocal verre',qty:'x4',price:'~8€',usage:'Meal prep mer',check:'Petit poisson = peu de mercure. BOCAL VERRE'},
-     ]
+     items:biocoopItems
     },
     {section:'GRAND FRAIS — St-Maximin',
      note:'Légumes frais + épicerie',
      items:[
-      {name:'Courgettes',qty:'500g',price:'~2€',usage:'Meal prep mer',check:'Conventionnel OK si PELÉES'},
-      {name:'Carottes',qty:'500g',price:'~1.50€',usage:'Meal prep mar',check:'Conventionnel OK si PELÉES'},
-      {name:'Citrons',qty:'3',price:'~1€',usage:'Meal prep mer',check:''},
+      {name:'Courgettes',qty:'500g',price:'~2€',usage:'Meal prep',check:'Conventionnel OK si PELÉES'},
+      {name:'Carottes',qty:'500g',price:'~1.50€',usage:'Meal prep',check:'Conventionnel OK si PELÉES'},
+      {name:'Citrons',qty:'3',price:'~1€',usage:'Vinaigrettes + poisson',check:''},
       {name:'Ail + oignons',qty:'',price:'~1€',usage:'Cuisine',check:'France. Ail de Chine = irradié'},
-      {name:'Patates douces',qty:'500g',price:'~2€',usage:'Meal prep jeu',check:''},
-      {name:'Lentilles vertes France',qty:'500g',price:'~2€',usage:'Meal prep mar+ven',check:'BIO si dispo. Ingrédient unique'},
-      {name:'Riz basmati',qty:'1kg',price:'~2.50€',usage:'Meal prep lun+mer',check:''},
+      {name:'Patates douces',qty:'500g',price:'~2€',usage:'Meal prep',check:''},
+      {name:'Champignons',qty:'300g',price:'~2€',usage:'Meal prep',check:''},
+      {name:'Lentilles vertes France',qty:'500g',price:'~2€',usage:'Meal prep',check:'BIO si dispo. Ingrédient unique'},
+      {name:'Lentilles corail',qty:'250g',price:'~2€',usage:'Meal prep Mer (sem 2)',check:''},
+      {name:'Pois chiches',qty:'400g bocal',price:'~2€',usage:'Meal prep Mer',check:'Bocal verre si dispo'},
+      {name:'Quinoa',qty:'500g',price:'~3€',usage:'Meal prep',check:''},
+      {name:'Boulgour',qty:'500g',price:'~2€',usage:'Meal prep',check:''},
+      {name:'Riz basmati',qty:'1kg',price:'~2.50€',usage:'Meal prep',check:''},
      ]
     },
     {section:'MARCHÉ VENDREDI — Place Delattre',
@@ -579,11 +714,13 @@ function getStoresShopping(){
 
 const SWAPS = [
   {cat:'Protéines viande',from:'Poulet (Hecquet)',to:'Dinde, Lapin, Veau, Pintade'},
-  {cat:'Protéines poisson',from:'Maquereau (bocal)',to:'Sardines bocal, Thon Phare d\'Eckmühl'},
-  {cat:'Féculents',from:'Riz basmati',to:'Quinoa, Boulgour, Semoule'},
-  {cat:'Féculents',from:'Lentilles vertes',to:'Pois chiches, Haricots rouges, Fèves'},
-  {cat:'Féculents',from:'Patate douce',to:'Pomme de terre, Riz basmati'},
-  {cat:'Légumes',from:'Brocolis',to:'Chou-fleur, Kale, Asperges'},
+  {cat:'Protéines viande',from:'Rumsteck',to:'Bavette, Onglet, Filet mignon, Faux-filet'},
+  {cat:'Protéines poisson',from:'Maquereau (bocal)',to:'Sardines bocal, Thon Phare d\'Eckmühl (max 2/sem)'},
+  {cat:'Protéines végétal',from:'Oeufs (code 0)',to:'Tofu ferme (pour variation végétarienne)'},
+  {cat:'Féculents',from:'Riz basmati',to:'Quinoa, Boulgour, Patate douce'},
+  {cat:'Féculents',from:'Lentilles vertes',to:'Lentilles corail, Pois chiches, Haricots rouges'},
+  {cat:'Féculents',from:'Patate douce',to:'Pomme de terre, Riz basmati, Quinoa'},
+  {cat:'Légumes',from:'Brocolis',to:'Chou-fleur, Haricots verts, Asperges'},
   {cat:'Légumes',from:'Courgettes',to:'Aubergine, Poivrons, Champignons'},
   {cat:'Légumes',from:'Haricots verts',to:'Brocolis, Asperges, Petit pois'},
   {cat:'Légumes',from:'Carottes',to:'Panais, Navets, Betterave'},
@@ -757,8 +894,10 @@ function getMealsForDay(dayIdx){
     foods:[{name:'Yaourt grec nature',qty:'200g'},{name:'Oeuf dur',qty:'1'}],
     supps:null,timeRange:[10,12],optional:true});
 
-  // 12h30 — Meal prep (rotation par jour de semaine)
-  const prep = MEAL_PREPS[dayIdx]; // dayIdx 0-4 = Lun-Ven
+  // 12h30 — Meal prep (rotation par semaine + jour)
+  const weekPlan = WEEK_PLANS[CURRENT_WEEK];
+  const prepIdx = weekPlan[dayIdx]; // dayIdx 0-4 = Lun-Ven
+  const prep = MEAL_PREPS[prepIdx];
   meals.push({id:`${dayKey}-lu`,name:'Meal prep — '+prep.name,time:'12h30',prot:prep.prot,cal:prep.cal,
     foods:prep.foods.map(f=>({name:f.n,qty:f.q})),supps:null,recipe:prep.recipe,timeRange:[11,14]});
 
@@ -950,6 +1089,7 @@ function resetAll(){if(confirm('Réinitialiser ?')){localStorage.removeItem('nt3
 let journalData = loadJournal();
 let currentEnergy = 0;
 let currentHunger = '';
+let currentMealRating = 0;
 
 function loadJournal(){
   try{return JSON.parse(localStorage.getItem('nt_journal'))||{}}catch(e){return{}}
@@ -964,6 +1104,17 @@ function setEnergy(n){
   });
 }
 
+function setMealRating(n){
+  currentMealRating=n;
+  const container=document.querySelector('.journal-input-group:has(#mealFeedback)');
+  if(!container)return;
+  const buttons=container.querySelectorAll('button');
+  buttons.forEach((b,i)=>{
+    if(i<n){b.style.background='var(--green)';b.style.color='#fff';b.style.borderColor='var(--green)'}
+    else{b.style.background='var(--bg2)';b.style.color='var(--text3)';b.style.borderColor='var(--bg3)'}
+  });
+}
+
 function setHunger(type){
   currentHunger=type;
   document.querySelectorAll('#hungerGroup .hunger-radio').forEach(r=>r.classList.remove('selected'));
@@ -974,6 +1125,7 @@ function setHunger(type){
 function saveJournal(){
   const weight=parseFloat(document.getElementById('weightInput').value)||null;
   const note=document.getElementById('noteInput').value.trim();
+  const mealFeedback=document.getElementById('mealFeedback').value.trim();
 
   const meals=getMealsForDay(selectedDayIndex);
   const countableMeals=meals.filter(m=>!m.windowClosed);
@@ -987,6 +1139,8 @@ function saveJournal(){
     energy:currentEnergy,
     hunger:currentHunger,
     hungerLabel:hungerLabels[currentHunger]||'',
+    mealRating:currentMealRating,
+    mealFeedback:mealFeedback,
     note:note,
     prot:tp,
     cal:tc,
@@ -1009,6 +1163,8 @@ function renderJournal(){
     if(todayData.note)document.getElementById('noteInput').value=todayData.note;
     if(todayData.energy)setEnergy(todayData.energy);
     if(todayData.hunger)setHunger(todayData.hunger);
+    if(todayData.mealRating)setMealRating(todayData.mealRating);
+    if(todayData.mealFeedback)document.getElementById('mealFeedback').value=todayData.mealFeedback;
   }
 
   const entries=Object.values(journalData).sort((a,b)=>b.date>a.date?1:-1);
@@ -1040,14 +1196,16 @@ function renderJournal(){
     const type=e.dayType==='on'?'Séance':'Repos';
     const pctMeals=e.totalMeals?Math.round(e.meals/e.totalMeals*100):0;
     const hungerStr=e.hungerLabel?' | Faim soir: '+e.hungerLabel:'';
+    const mealRatingStr=e.mealRating?' | Meal prep: '+e.mealRating+'/5':'';
 
     histHtml+=`<div class="journal-entry">
       <div class="journal-entry-date">${dateStr} — ${type}</div>
       <div class="journal-entry-stats">
         ${e.weight?e.weight+'kg | ':''}${e.prot}g prot | ${e.cal} kcal | ${e.meals}/${e.totalMeals} repas (${pctMeals}%)
-        ${e.energy?' | Énergie: '+e.energy+'/5':''}${hungerStr}
+        ${e.energy?' | Énergie: '+e.energy+'/5':''}${hungerStr}${mealRatingStr}
       </div>
       ${e.note?'<div class="journal-entry-note">'+e.note+'</div>':''}
+      ${e.mealFeedback?'<div class="journal-entry-note" style="color:var(--green);margin-top:4px"><b>Avis meal prep :</b> '+e.mealFeedback+'</div>':''}
     </div>`;
   });
   document.getElementById('journalHistory').innerHTML=histHtml||'<div style="text-align:center;color:var(--text3);padding:20px">Aucune entrée pour l\'instant. Sauvegarde ta première journée !</div>';
